@@ -1,7 +1,7 @@
 import axios from "axios";
 import { router } from "expo-router";
 import { Properties } from "../config/properties";
-import { getToken, removeToken } from "../util/store";
+import { clearAuthData, getToken } from "../util/store";
 
 const custom_axios = axios.create({
     baseURL: Properties.PRIVATE_API_URL,
@@ -31,7 +31,7 @@ custom_axios.interceptors.response.use(
     async (error) => {
         if (error.response?.status) {
             if (error.response.status === 401) {
-                await removeToken();
+                await clearAuthData();
                 router.replace("/login");
             }
         }
@@ -94,8 +94,7 @@ export const getChats = async (sender?: string, receiver?: string, groupId?: str
         if(receiver) queryParams.append('receiver', receiver);
         if(groupId) queryParams.append('groupId', groupId);
         const response = await custom_axios.get(`/chats?${queryParams.toString()}`);
-        console.log("get chats response", response.data);
-        return response;
+        return response?.data;
     } catch (error) {
         console.log("get chats error", error);
         throw error;

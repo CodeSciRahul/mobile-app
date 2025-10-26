@@ -4,6 +4,7 @@ import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from
 import { useQuery } from '@tanstack/react-query';
 import { Groups, Group } from '../../../types';
 import { getGroups } from '../../../services/apiServices';
+import { useReceiver } from '../../../zustand/receiver.store';
 export default function GroupsScreen() {
   const { data: groups, isLoading } = useQuery<Groups>({
     queryKey: ['groups'],
@@ -12,10 +13,14 @@ export default function GroupsScreen() {
       return response.data;
     },
   });
+  const { setReceiver } = useReceiver();
   const renderGroupItem = ({ item }: { item: Group }) => (
     <TouchableOpacity 
     className="flex-row items-center p-4 border-b border-gray-200"
-    onPress={() => router.push(`/chat/${item?._id}`)}>
+    onPress={() => {
+      setReceiver({receiver: item, selectionType: "group"})
+      router.push(`/chat/${item?._id}`);
+    }}>
       <View className="w-12 h-12 rounded-full bg-blue-500 items-center justify-center mr-3">
         {item.profilePicture ? (
           <Image source={{ uri: item.profilePicture }} className="w-12 h-12 rounded-full" />

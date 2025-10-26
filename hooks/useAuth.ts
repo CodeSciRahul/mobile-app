@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { getToken, removeToken } from "../util/store";
+import { clearAuthData, getToken, getUserInfo } from "../util/store";
 
 export const useLogout = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
     mutationFn: async () => {
-      await removeToken();
+      await clearAuthData();
     },
     onSuccess: () => {
       queryClient.clear();
@@ -28,10 +28,18 @@ export const useRemoveAuthToken = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      await removeToken();
+      await clearAuthData();
     },
     onSuccess: () => {
       queryClient.clear();
     }
+  });
+};
+
+export const useUserInfo = () => {
+  return useQuery({
+    queryKey: ['auth', 'userInfo'],
+    queryFn: getUserInfo,
+    staleTime: Infinity,
   });
 };

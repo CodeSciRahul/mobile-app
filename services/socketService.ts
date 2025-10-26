@@ -1,7 +1,7 @@
-import io, { Socket } from "socket.io-client";
-import toast from "react-hot-toast";
-import { Reaction, ServerMessage } from "../types";
 import { Properties } from "@/config/properties";
+import { toast } from "@backpackapp-io/react-native-toast";
+import io, { Socket } from "socket.io-client";
+import { Reaction, ServerMessage } from "../types";
 
 // Socket setup
 export const socket: Socket = io(Properties.PRIVATE_SOCKET_BASE_URL, {
@@ -51,16 +51,8 @@ export const socketHandlers = {
   // Send a message
   sendMessage: (
     messageData: {
-      sender: {
-        _id: string;
-        name: string;
-        email: string;
-      };
-      receiver: {
-        _id: string;
-        name: string;
-        email: string;
-      };
+      senderId: string;
+      receiverId?: string;
       groupId?: string;
       content: string;
       messageType: 'private' | 'group';
@@ -74,7 +66,7 @@ export const socketHandlers = {
 
     if (messageData.messageType === 'group') {
       socket.emit("send_group_message", {
-        senderId: messageData.sender._id,
+        senderId: messageData.senderId,
         groupId: messageData.groupId,
         content: messageData.content,
         messageType: 'group',
@@ -82,8 +74,8 @@ export const socketHandlers = {
       });
     } else {
       socket.emit("send_message", {
-        senderId: messageData.sender._id,
-        receiverId: messageData.receiver._id,
+        senderId: messageData.senderId,
+        receiverId: messageData.receiverId,
         content: messageData.content,
         messageType: 'private',
         replyTo: messageData.replyTo
@@ -116,6 +108,15 @@ export const socketHandlers = {
       return;
     }
     socket.emit("leave_group", { groupId, userId });
+  },
+
+  // Leave a room
+  leaveRoom: (senderId: string, receiverId: string) => {
+    if (!socket.connected) {
+      toast.error("Socket is not connected - Cannot leave room");
+      return;
+    }
+    socket.emit("leave_room", { senderId, receiverId });
   }
 };
 
@@ -125,6 +126,7 @@ export const setupSocketListeners = (
 ) => {
   // Handle private messages
   socket.on("receive_message", (newMessage: any) => {
+    console.log("receive_message", newMessage);
     setMessages((prevMessages) => [
       ...prevMessages,
       newMessage as ServerMessage,   
@@ -133,6 +135,7 @@ export const setupSocketListeners = (
 
   // Handle group messages
   socket.on("receive_group_message", (newMessage: any) => {
+    console.log("receive_group_message", newMessage);
     setMessages((prevMessages) => [
       ...prevMessages,
       newMessage as ServerMessage,

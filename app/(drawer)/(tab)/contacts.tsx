@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from
 import {getReceivers} from '../../../services/apiServices';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Receivers, ReceiversResponse, Receiver } from '../../../types';
+import { useReceiver } from '../../../zustand/receiver.store';
 
 export default function ChatsScreen() {
   const router = useRouter();
@@ -15,10 +16,15 @@ export default function ChatsScreen() {
     },
   });
 
+  const {setReceiver} = useReceiver()
+
   const renderChatItem = ({ item }: { item: Receiver }) => (
     <TouchableOpacity 
       className="flex-row items-center p-4 border-b border-gray-200"
-      onPress={() => router.push(`/chat/${item._id}`)}
+      onPress={() => {
+        setReceiver({receiver: item, selectionType: "private"})
+        router.push(`/chat/${item._id}`);
+      }}
     >
       <View className="w-12 h-12 rounded-full bg-blue-500 items-center justify-center mr-3">
         {item?.profilePicture ? (

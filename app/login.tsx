@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import { signin } from "../services/apiServices";
-import { storeToken } from "../util/store";
+import { storeAuthData } from "../util/store";
 export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,7 +20,10 @@ export default function LoginScreen() {
         onSuccess: async (response) => {
             console.log("login successfully", response.data)
             const token = response.data.token;
-            await storeToken(token);
+            const userInfo = response.data.user;
+            console.log("userInfo", userInfo);
+            console.log("token", token);
+            await storeAuthData(token, userInfo);
             router.replace("/(drawer)/(tab)/contacts")
         },
         onError: (error: any) => {

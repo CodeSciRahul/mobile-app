@@ -9,7 +9,7 @@ export default function Index() {
   useEffect(() => {
     if (!isLoading) {
       if (token) {
-        router.replace("/(drawer)/(tab)");
+        router.replace("/(drawer)/(tab)/contacts");
       } else {
         console.log("token not found, redirecting to login fron index")
         router.replace("/login");
