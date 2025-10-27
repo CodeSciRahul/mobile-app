@@ -4,7 +4,7 @@ import { Properties } from "../config/properties";
 import { clearAuthData, getToken } from "../util/store";
 
 const custom_axios = axios.create({
-    baseURL: Properties.PRIVATE_API_URL,
+    baseURL: Properties.PUBLIC_API_URL,
     headers: {
         "Content-Type": "application/json",
     },
