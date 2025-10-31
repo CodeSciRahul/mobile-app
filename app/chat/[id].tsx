@@ -1,17 +1,16 @@
+import Message from '@/components/Message';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AuthGuard from '../../components/AuthGuard';
 import { useUserInfo } from '../../hooks/useAuth';
 import { getChats } from '../../services/apiServices';
 import { cleanupSocketListeners, setupSocketListeners, socketHandlers } from "../../services/socketService";
 import { ServerMessage } from '../../types';
 import { useReceiver } from '../../zustand/receiver.store';
-import Message from '@/components/Message';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 
 export default function ChatScreen() {
@@ -24,6 +23,7 @@ export default function ChatScreen() {
   const { data: userInfo } = useUserInfo();
   const { receiver } = useReceiver();
   const selectionType = receiver?.selectionType
+  const insets = useSafeAreaInsets();
   const { data: chats, isLoading } = useQuery<ServerMessage[]>({
     queryKey: ['chats', receiverId, selectionType],
     queryFn: () => {
@@ -100,13 +100,8 @@ export default function ChatScreen() {
   }
 
   return (
-    <SafeAreaProvider className='flex-1 bg-red-500'>
-    <AuthGuard>
-      <KeyboardAvoidingView
-        className="flex-1 bg-white"
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={90}
-      >
+    <SafeAreaView className='flex-1 bg-white'>
+      <AuthGuard>
         {/* Header */}
         <View className="flex-row items-center p-4 border-b border-gray-200 bg-white">
           <TouchableOpacity className="mr-3" onPress={() => router.back()}>
@@ -129,99 +124,105 @@ export default function ChatScreen() {
           </View>
         </View>
 
-        {/* Messages */}
-        {!isLoading ? (
-          <FlatList
-            data={messages}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <Message
-                item={item}
-                key={item._id}
-                setIsReplyTo={setIsReplyTo}
-                selectedMessage={selectedMessage}
-                setSelectedMessage={setSelectedMessage}
-              />
-            )}
-            className="flex-1 px-4 py-2"
-            showsVerticalScrollIndicator={false}
-          />
-        ) : (
-          <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color="#007AFF" />
-          </View>
-        )}
-
-        {/* Message Input */}
-        <View className="border-t border-gray-200 bg-white">
-          {/* --- Reply Preview (if any) --- */}
-          {selectedMessage && isReplyTo && (
-            <View className="flex-row items-start px-4 py-2 bg-gray-100 border-l-4 border-blue-500">
-              <View className="flex-1">
-                <Text className="text-xs text-gray-600 font-medium">
-                  Replying to {selectedMessage.sender.name}
-                </Text>
-
-                {/* If it’s an image/file message */}
-                {selectedMessage.fileUrl ? (
-                  <View className="flex-row items-center mt-1">
-                    {selectedMessage.fileType?.startsWith("image/") && (
-                      <Image
-                        source={{ uri: selectedMessage.fileUrl }}
-                        className="w-10 h-10 rounded mr-2"
-                      />
-                    )}
-                    <Text
-                      numberOfLines={2}
-                      className="text-sm text-gray-700 flex-shrink"
-                    >
-                      {selectedMessage.content || "File message"}
-                    </Text>
-                  </View>
-                ) : (
-                  <Text numberOfLines={2} className="text-sm text-gray-700 mt-1">
-                    {selectedMessage.content}
-                  </Text>
-                )}
-              </View>
-
-              {/* Close (Cancel reply) */}
-              <TouchableOpacity
-                onPress={() => {
-                  setIsReplyTo(false)
-                  setSelectedMessage(null)
-                }}
-                className="ml-2 p-1"
-              >
-                <Ionicons name="close" size={20} color="#666" />
-              </TouchableOpacity>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        >
+          {/* Messages */}
+          {!isLoading ? (
+            <FlatList
+              data={messages}
+              keyExtractor={(item) => item._id}
+              renderItem={({ item }) => (
+                <Message
+                  item={item}
+                  key={item._id}
+                  setIsReplyTo={setIsReplyTo}
+                  selectedMessage={selectedMessage}
+                  setSelectedMessage={setSelectedMessage}
+                />
+              )}
+              className="flex-1 px-4 py-2"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 20 }}
+            />
+          ) : (
+            <View className="flex-1 items-center justify-center">
+              <ActivityIndicator size="large" color="#007AFF" />
             </View>
           )}
 
-          {/* --- Message Input Bar --- */}
-          <View className="flex-row items-center p-4 bg-white">
-            <TouchableOpacity className="mr-3">
-              <Ionicons name="add" size={24} color="#007AFF" />
-            </TouchableOpacity>
+          {/* Message Input */}
+          <View className="border-t border-gray-200 bg-white">
+            {/* --- Reply Preview (if any) --- */}
+            {selectedMessage && isReplyTo && (
+              <View className="flex-row items-start px-4 py-2 bg-gray-100 border-l-4 border-blue-500">
+                <View className="flex-1">
+                  <Text className="text-xs text-gray-600 font-medium">
+                    Replying to {selectedMessage.sender.name}
+                  </Text>
 
-            <TextInput
-              value={message}
-              onChangeText={setMessage}
-              placeholder="Type a message..."
-              className="flex-1 border border-gray-300 rounded-full px-4 py-3 mr-3"
-              multiline
-            />
+                  {/* If it's an image/file message */}
+                  {selectedMessage.fileUrl ? (
+                    <View className="flex-row items-center mt-1">
+                      {selectedMessage.fileType?.startsWith("image/") && (
+                        <Image
+                          source={{ uri: selectedMessage.fileUrl }}
+                          className="w-10 h-10 rounded mr-2"
+                        />
+                      )}
+                      <Text
+                        numberOfLines={2}
+                        className="text-sm text-gray-700 flex-shrink"
+                      >
+                        {selectedMessage.content || "File message"}
+                      </Text>
+                    </View>
+                  ) : (
+                    <Text numberOfLines={2} className="text-sm text-gray-700 mt-1">
+                      {selectedMessage.content}
+                    </Text>
+                  )}
+                </View>
 
-            <TouchableOpacity
-              onPress={sendMessage}
-              className="bg-blue-500 w-10 h-10 rounded-full items-center justify-center"
-            >
-              <Ionicons name="send" size={20} color="white" />
-            </TouchableOpacity>
+                {/* Close (Cancel reply) */}
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsReplyTo(false)
+                    setSelectedMessage(null)
+                  }}
+                  className="ml-2 p-1"
+                >
+                  <Ionicons name="close" size={20} color="#666" />
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* --- Message Input Bar --- */}
+            <View className="flex-row items-center p-4 bg-white" style={{ paddingBottom: insets.bottom + 16 }}>
+              <TouchableOpacity className="mr-3">
+                <Ionicons name="add" size={24} color="#007AFF" />
+              </TouchableOpacity>
+
+              <TextInput
+                value={message}
+                onChangeText={setMessage}
+                placeholder="Type a message..."
+                className="flex-1 border border-gray-300 rounded-full px-4 py-3 mr-3"
+                multiline
+              />
+
+              <TouchableOpacity
+                onPress={sendMessage}
+                className="bg-blue-500 w-10 h-10 rounded-full items-center justify-center"
+              >
+                <Ionicons name="send" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </KeyboardAvoidingView>
-    </AuthGuard>
-    </SafeAreaProvider>
+        </KeyboardAvoidingView>
+      </AuthGuard>
+    </SafeAreaView>
   );
 }

@@ -48,7 +48,7 @@ export default function Message({ item, setIsReplyTo, selectedMessage, setSelect
             }
         })
         .onEnd(() => {
-            if (translateX.value > 80) {
+            if (translateX.value > 50) {
                 runOnJS(setIsReplyTo)(true)
                 runOnJS(setSelectedMessage)((item))
             }

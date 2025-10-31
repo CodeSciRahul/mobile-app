@@ -1,9 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Drawer } from "expo-router/drawer";
 import AuthGuard from "../../components/AuthGuard";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function DrawerLayout() {
     return (
+        <SafeAreaView className="flex-1 bg-green-800">
         <AuthGuard>
             <Drawer
             screenOptions={{
@@ -40,5 +42,6 @@ export default function DrawerLayout() {
                     }} />
             </Drawer>
         </AuthGuard>
+        </SafeAreaView>
     )
 }

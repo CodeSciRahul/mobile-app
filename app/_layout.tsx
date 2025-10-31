@@ -4,12 +4,14 @@ import { Stack } from "expo-router";
 import { useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../global.css";
+import {GestureHandlerRootView} from "react-native-gesture-handler";
 
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>
+      <GestureHandlerRootView className="flex-1">
       <SafeAreaProvider>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -29,9 +31,16 @@ export default function RootLayout() {
               presentation: 'card'
             }} 
           />
+          <Stack.Screen 
+          name="group" 
+          options={{ 
+            headerShown: true,
+            title: 'Create Group',
+          }} /> 
         </Stack>
         <Toasts />
       </SafeAreaProvider>
+      </GestureHandlerRootView>
     </QueryClientProvider>
   );
 }

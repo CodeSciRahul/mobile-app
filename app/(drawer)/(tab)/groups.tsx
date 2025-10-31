@@ -67,6 +67,11 @@ export default function GroupsScreen() {
         renderItem={renderGroupItem}
         showsVerticalScrollIndicator={false}
       />
+        <View className="absolute bottom-10 right-10 p-4 bg-gray-200 rounded-xl">
+          <TouchableOpacity onPress={() => router.push('/group')} className=''>
+            <Ionicons name="add" size={24} color="#007AFF" />
+          </TouchableOpacity>
+        </View>
     </View>
     )
   );
