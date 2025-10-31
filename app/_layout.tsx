@@ -1,10 +1,11 @@
-import { Toasts } from "@backpackapp-io/react-native-toast";
+import { PortalHost } from '@rn-primitives/portal';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import "../global.css";
-import {GestureHandlerRootView} from "react-native-gesture-handler";
 
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient());
@@ -38,7 +39,8 @@ export default function RootLayout() {
             title: 'Create Group',
           }} /> 
         </Stack>
-        <Toasts />
+        <PortalHost />
+        <Toast />
       </SafeAreaProvider>
       </GestureHandlerRootView>
     </QueryClientProvider>

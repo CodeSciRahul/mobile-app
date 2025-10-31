@@ -5,7 +5,7 @@ import { Image, Pressable, Text, View } from 'react-native';
 import { useUserInfo } from '../hooks/useAuth';
 
 import { Reaction, ServerMessage } from '../types';
-import Popover from '../components/ui/popover';
+import Popover from './popover';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Reply } from 'lucide-react-native';
 import Animated, {

@@ -3,8 +3,8 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/input";
 
 export default function SignUpScreen() {
     const [name, setName] = useState("");
@@ -93,35 +93,35 @@ export default function SignUpScreen() {
                         <View className="flex-1 justify-center">
                             <View className="space-y-6">
                                 <Input
-                                    label="Full Name"
                                     placeholder="Enter your full name"
                                     value={name}
                                     onChangeText={setName}
                                     autoCapitalize="words"
                                     autoCorrect={false}
+                                    className="mb-4"
                                 />
 
                                 <Input
-                                    label="Email Address"
                                     placeholder="Enter your email"
                                     value={email}
                                     onChangeText={setEmail}
                                     keyboardType="email-address"
                                     autoCapitalize="none"
                                     autoCorrect={false}
+                                    className="mb-4"
                                 />
 
                                 <View>
                                     <Input
-                                        label="Password"
                                         placeholder="Create a password"
                                         value={password}
                                         onChangeText={setPassword}
                                         secureTextEntry={!showPassword}
+                                        className="mb-4"
                                     />
                                     <TouchableOpacity
                                         onPress={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-8"
+                                        className="absolute right-3 top-3"
                                     >
                                         <Ionicons 
                                             name={showPassword ? "eye-off" : "eye"} 
@@ -133,15 +133,15 @@ export default function SignUpScreen() {
 
                                 <View>
                                     <Input
-                                        label="Confirm Password"
                                         placeholder="Confirm your password"
                                         value={confirmPassword}
                                         onChangeText={setConfirmPassword}
                                         secureTextEntry={!showConfirmPassword}
+                                        className="mb-4"
                                     />
                                     <TouchableOpacity
                                         onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        className="absolute right-3 top-8"
+                                        className="absolute right-3 top-3"
                                     >
                                         <Ionicons 
                                             name={showConfirmPassword ? "eye-off" : "eye"} 
@@ -158,12 +158,12 @@ export default function SignUpScreen() {
                                 </View>
 
                                 <Button
-                                    title={isLoading ? "Creating Account..." : "Create Account"}
                                     onPress={handleSignUp}
                                     disabled={isLoading}
-                                    size="large"
                                     className="w-full"
-                                />
+                                >
+                                    <Text>{isLoading ? "Creating Account..." : "Create Account"}</Text>
+                                </Button>
                             </View>
                         </View>
 

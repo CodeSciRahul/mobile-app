@@ -1,128 +1,56 @@
-import Ionicons from "@expo/vector-icons/build/Ionicons";
-import { useEffect, useRef } from "react";
-import { Animated, Pressable, Text, View, TouchableWithoutFeedback } from "react-native";
+import { NativeOnlyAnimatedView } from '@/components/ui/native-only-animated-view';
+import { TextClassContext } from '@/components/ui/text';
+import { cn } from '@/lib/utils';
+import * as PopoverPrimitive from '@rn-primitives/popover';
+import * as React from 'react';
+import { Platform, StyleSheet } from 'react-native';
+import { FadeIn, FadeOut } from 'react-native-reanimated';
+import { FullWindowOverlay as RNFullWindowOverlay } from 'react-native-screens';
 
-interface PopoverProps {
-    visible: boolean;
-    onClose: () => void;
-    onDeselectMessage: () => void;
-    isMyMessage: boolean;
-    onForward: () => void;
-    onDelete: () => void;
-    onCopy: () => void;
+const Popover = PopoverPrimitive.Root;
+
+const PopoverTrigger = PopoverPrimitive.Trigger;
+
+const FullWindowOverlay = Platform.OS === 'ios' ? RNFullWindowOverlay : React.Fragment;
+
+function PopoverContent({
+  className,
+  align = 'center',
+  sideOffset = 4,
+  portalHost,
+  ...props
+}: PopoverPrimitive.ContentProps &
+  React.RefAttributes<PopoverPrimitive.ContentRef> & {
+    portalHost?: string;
+  }) {
+  return (
+    <PopoverPrimitive.Portal hostName={portalHost}>
+      <FullWindowOverlay>
+        <PopoverPrimitive.Overlay style={Platform.select({ native: StyleSheet.absoluteFill })}>
+          <NativeOnlyAnimatedView entering={FadeIn.duration(200)} exiting={FadeOut}>
+            <TextClassContext.Provider value="text-popover-foreground">
+              <PopoverPrimitive.Content
+                align={align}
+                sideOffset={sideOffset}
+                className={cn(
+                  'bg-popover border-border outline-hidden z-50 w-72 rounded-md border p-4 shadow-md shadow-black/5',
+                  Platform.select({
+                    web: cn(
+                      'animate-in fade-in-0 zoom-in-95 origin-(--radix-popover-content-transform-origin) cursor-auto',
+                      props.side === 'bottom' && 'slide-in-from-top-2',
+                      props.side === 'top' && 'slide-in-from-bottom-2'
+                    ),
+                  }),
+                  className
+                )}
+                {...props}
+              />
+            </TextClassContext.Provider>
+          </NativeOnlyAnimatedView>
+        </PopoverPrimitive.Overlay>
+      </FullWindowOverlay>
+    </PopoverPrimitive.Portal>
+  );
 }
 
-export default function Popover({ visible, onClose, onDeselectMessage, isMyMessage, onForward, onDelete, onCopy }: PopoverProps) {
-    const scaleAnim = useRef(new Animated.Value(0)).current;
-    const opacityAnim = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        if (visible) {
-            Animated.parallel([
-                Animated.spring(scaleAnim, {
-                    toValue: 1,
-                    useNativeDriver: true,
-                    tension: 100,
-                    friction: 8,
-                }),
-                Animated.timing(opacityAnim, {
-                    toValue: 1,
-                    duration: 200,
-                    useNativeDriver: true,
-                }),
-            ]).start();
-        } else {
-            Animated.parallel([
-                Animated.timing(scaleAnim, {
-                    toValue: 0,
-                    duration: 150,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(opacityAnim, {
-                    toValue: 0,
-                    duration: 150,
-                    useNativeDriver: true,
-                }),
-            ]).start();
-        }
-    }, [visible]);
-
-    const handleAction = (action: () => void) => {
-        action();
-        onClose();
-        onDeselectMessage()
-    };
-
-    if (!visible) return null;
-
-    const menuItems = [
-        {
-            icon: "arrow-forward-outline" as const,
-            label: "Forward",
-            action: onForward,
-            color: "#34C759",
-            bgColor: "#E8F5E8"
-        },
-        {
-            icon: "copy-outline" as const,
-            label: "Copy",
-            action: onCopy,
-            color: "#FF9500",
-            bgColor: "#FFF3E0"
-        }
-    ];
-
-    // if (isMyMessage) {
-    //     menuItems.push({
-    //         icon: "trash-outline" as const,
-    //         label: "Delete",
-    //         action: onDelete,
-    //         color: "#FF3B30",
-    //         bgColor: "#FFEBEE"
-    //     });
-    // }
-
-    return (
-        <TouchableWithoutFeedback onPress={onClose}>
-        <Animated.View 
-            style={{
-                opacity: opacityAnim,
-                transform: [{ scale: scaleAnim }],
-            }}
-            className={`absolute ${!isMyMessage ? 'top-0 right-0' : 'top-0 left-0'} bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50`}
-        >
-            <View className="py-2">
-                {menuItems.map((item, index) => (
-                    <Pressable
-                        key={index}
-                        onPress={() => handleAction(item.action)}
-                        className="flex-row items-center px-4 py-3 min-w-[140px]"
-                        style={({ pressed }) => [
-                            {
-                                backgroundColor: pressed ? item.bgColor : 'transparent',
-                            }
-                        ]}
-                    >
-                        <View 
-                            className="w-8 h-8 rounded-full items-center justify-center mr-3"
-                            style={{ backgroundColor: item.bgColor }}
-                        >
-                            <Ionicons 
-                                name={item.icon} 
-                                size={18} 
-                                color={item.color} 
-                            />
-                        </View>
-                        <Text 
-                            className="text-sm font-medium flex-1"
-                            style={{ color: '#1F2937' }}
-                        >
-                            {item.label}
-                        </Text>
-                    </Pressable>
-                ))}
-            </View>
-        </Animated.View>
-        </TouchableWithoutFeedback>
-    )
-}   
+export { Popover, PopoverContent, PopoverTrigger };

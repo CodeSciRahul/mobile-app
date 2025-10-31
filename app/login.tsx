@@ -4,8 +4,8 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/input";
 import { signin } from "../services/apiServices";
 import { storeAuthData } from "../util/store";
 export default function LoginScreen() {
@@ -77,26 +77,26 @@ export default function LoginScreen() {
                         <View className="flex-1 justify-center">
                             <View className="space-y-6">
                                 <Input
-                                    label="Email Address"
                                     placeholder="Enter your email"
                                     value={email}
                                     onChangeText={setEmail}
                                     keyboardType="email-address"
                                     autoCapitalize="none"
                                     autoCorrect={false}
+                                    className="mb-4"
                                 />
 
                                 <View>
                                     <Input
-                                        label="Password"
                                         placeholder="Enter your password"
                                         value={password}
                                         onChangeText={setPassword}
                                         secureTextEntry={!showPassword}
+                                        className="mb-4"
                                     />
                                     <TouchableOpacity
                                         onPress={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-8"
+                                        className="absolute right-3 top-3"
                                     >
                                         <Ionicons 
                                             name={showPassword ? "eye-off" : "eye"} 
@@ -113,12 +113,12 @@ export default function LoginScreen() {
                                 </TouchableOpacity>
 
                                 <Button
-                                    title={isLoading ? "Signing In..." : "Sign In"}
                                     onPress={handleLogin}
                                     disabled={isLoading}
-                                    size="large"
                                     className="w-full"
-                                />
+                                >
+                                    <Text>{isLoading ? "Signing In..." : "Sign In"}</Text>
+                                </Button>
                             </View>
                         </View>
 

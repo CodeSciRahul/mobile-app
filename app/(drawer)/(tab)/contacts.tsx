@@ -1,20 +1,17 @@
-import { useRouter } from 'expo-router';
-import { ActivityIndicator, Button, FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
-import {getReceivers} from '../../../services/apiServices';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Receivers, ReceiversResponse, Receiver } from '../../../types';
-import { useReceiver } from '../../../zustand/receiver.store';
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import BottomSheet from '@gorhom/bottom-sheet';
-import { useMemo, useRef, useState } from 'react';
-import { BlurView } from 'expo-blur';
-import { TextInput } from 'react-native-gesture-handler';
-import Input from '../../../components/ui/Input';
-import { addUser } from '../../../services/apiServices';
+import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { BlurView } from 'expo-blur';
+import { useRouter } from 'expo-router';
+import { useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { Button } from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/input';
+import { addUser, getReceivers } from '../../../services/apiServices';
+import { Receiver, ReceiversResponse } from '../../../types';
+import { useReceiver } from '../../../zustand/receiver.store';
 
 
 export default function ChatsScreen() {
@@ -147,14 +144,15 @@ export default function ChatsScreen() {
         className="bg-white/70 rounded-t-xl p-5"
         >
           <Text className="text-lg text-center font-bold mb-4">Add Contact</Text>
-          <Input placeholder="Email or Phone Number" value={contact} onChangeText={setContact} />
+          <Input placeholder="Email or Phone Number" value={contact} onChangeText={setContact} className="mb-4" />
           <Button 
-          title="Add Contact" 
           onPress={() => {
             addUserMutation({ email: contact });
           }} 
           disabled={isAddingUser}
-          />
+          >
+            <Text>Add Contact</Text>
+          </Button>
         </BottomSheetView>
       </BottomSheetModal>
     </BottomSheetModalProvider>
