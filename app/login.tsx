@@ -83,7 +83,7 @@ export default function LoginScreen() {
                                     keyboardType="email-address"
                                     autoCapitalize="none"
                                     autoCorrect={false}
-                                    className="mb-4"
+                                    className="mb-4 py-2"
                                 />
 
                                 <View>
@@ -115,9 +115,9 @@ export default function LoginScreen() {
                                 <Button
                                     onPress={handleLogin}
                                     disabled={isLoading}
-                                    className="w-full"
+                                    className="w-full  bg-blue-600 text-white"
                                 >
-                                    <Text>{isLoading ? "Signing In..." : "Sign In"}</Text>
+                                    <Text className="text-white text-center font-bold">{isLoading ? "Signing In..." : "Sign In"}</Text>
                                 </Button>
                             </View>
                         </View>

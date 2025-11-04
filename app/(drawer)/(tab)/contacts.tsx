@@ -1,18 +1,17 @@
+import { BottomSheetComponent, BottomSheetRef } from '@/components/ui/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import { useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Button } from '../../../components/ui/Button';
-import { Input } from '../../../components/ui/input';
 import { addUser, getReceivers } from '../../../services/apiServices';
 import { Receiver, ReceiversResponse } from '../../../types';
 import { useReceiver } from '../../../zustand/receiver.store';
-
+import {  Input} from '../../../components/ui/input';
 
 export default function ChatsScreen() {
   const router = useRouter();
@@ -20,6 +19,9 @@ export default function ChatsScreen() {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['50%', '90%'], []);
   const [contact, setContact] = useState<string>('')
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
+
+  const bottomSheetRef = useRef<BottomSheetRef>(null);
 
   const { data: receivers, isLoading, refetch } = useQuery<ReceiversResponse>({
     queryKey: ['receivers'],
@@ -97,6 +99,8 @@ export default function ChatsScreen() {
     </TouchableOpacity>
   );
 
+
+
   return (
     isLoading ? (
       <ActivityIndicator size="large" color="#0000ff" />
@@ -109,14 +113,91 @@ export default function ChatsScreen() {
         renderItem={renderChatItem}
         showsVerticalScrollIndicator={false}
       />
-        <View className="absolute bottom-10 right-10 p-4 bg-gray-200 rounded-xl">
-          <TouchableOpacity onPress={() => bottomSheetModalRef.current?.present()} className=''>
+          <TouchableOpacity onPress={() => { setBottomSheetOpen(true); requestAnimationFrame(() => bottomSheetRef.current?.present()); }} className='absolute bottom-10 right-10 p-4 bg-gray-200 rounded-xl'>
             <Ionicons name="add" size={24} color="#007AFF" />
           </TouchableOpacity>
-        </View>
     </View>
+      <BottomSheetComponent 
+        snapPoints={['80%']}
+        initialSnapIndex={0}
+        ref={bottomSheetRef}
+      >
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
+        <View className="px-6 pb-6">
+          <View className="items-center mb-6">
+            <View className="w-16 h-16 rounded-full bg-blue-500 items-center justify-center mb-4"
+              style={{
+                shadowColor: '#3b82f6',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 8,
+              }}
+            >
+              <Ionicons name="person-add" size={32} color="#ffffff" />
+            </View>
+            <Text className="text-2xl font-bold text-gray-900 mb-2">Add New Contact</Text>
+            <Text className="text-sm text-gray-500 text-center px-4">
+              Enter an email address or phone number to add a contact
+            </Text>
+          </View>
 
-    <BottomSheetModalProvider>
+          <View className="mb-6">
+            <View className="flex-row items-center mb-2">
+              <View className="mr-2">
+                <Ionicons name="mail-outline" size={20} color="#6b7280" />
+              </View>
+              <Text className="text-sm font-semibold text-gray-700">Email or Phone Number</Text>
+            </View>
+            <Input
+              placeholder="contact@example.com or +1234567890" 
+              value={contact} 
+              onChangeText={setContact} 
+              className="mb-4 bg-gray-50 border-gray-200 focus:border-blue-500"
+            />
+          </View>
+
+          <Button 
+            onPress={() => {
+              if (contact.trim()) {
+                addUserMutation({ email: contact });
+                setContact('');
+                setBottomSheetOpen(false);
+              }
+            }} 
+            disabled={isAddingUser || !contact.trim()}
+            className="bg-blue-500 py-4 rounded-xl shadow-lg"
+            style={{
+              shadowColor: '#3b82f6',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 6,
+            }}
+          >
+            {isAddingUser ? (
+              <View className="flex-row items-center justify-center">
+                <View className="mr-2">
+                  <ActivityIndicator size="small" color="#ffffff" />
+                </View>
+                <Text className="text-white font-semibold text-base">Adding...</Text>
+              </View>
+            ) : (
+              <View className="flex-row items-center justify-center">
+                <View className="mr-2">
+                  <Ionicons name="checkmark-circle" size={20} color="#ffffff" />
+                </View>
+                <Text className="text-white font-semibold text-base">Add Contact</Text>
+              </View>
+            )}
+          </Button>
+        </View>
+        </KeyboardAvoidingView>
+      </BottomSheetComponent>
+
+    
+
+    {/* <BottomSheetModalProvider>
       <BottomSheetModal 
       ref={bottomSheetModalRef} 
       index={0} 
@@ -155,7 +236,7 @@ export default function ChatsScreen() {
           </Button>
         </BottomSheetView>
       </BottomSheetModal>
-    </BottomSheetModalProvider>
+    </BottomSheetModalProvider> */}
     </View>
     )
   );

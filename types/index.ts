@@ -6,7 +6,7 @@ export interface User {
     _id: string;
     name: string;
     email: string;
-    mobile: string;
+    mobile?: string;
     isVerified: boolean;
     googleId: string | null;
     facebookId: string | null;
@@ -19,7 +19,7 @@ export interface User {
     _id: string | null;
     name: string | null;
     email: string | null;
-    mobile: string | null;
+    mobile?: string | null;
     isVerified: boolean;
     googleId: string | null;
     facebookId: string | null;
@@ -41,8 +41,8 @@ export interface User {
   export interface SignupRequest {
     email: string;
     password: string;
+    mobile?: string | null;
     name: string;
-    mobile: string;
   }
   
   export interface LoginResponse {
@@ -64,7 +64,7 @@ export interface User {
   export interface SignupFormInputs {
     name: string;
     email: string;
-    mobile: string;
+    mobile?: string | null;
     password: string;
   }
   
@@ -76,7 +76,7 @@ export interface User {
     _id: string;
     name: string;
     email: string;
-    mobile: string;
+    mobile?: string | null;
     profilePicture: string;
     lastMessage: string;
     lastMessageTimestamp: string;
@@ -89,7 +89,7 @@ export interface User {
     _id: string | null;
     name: string | null;
     email: string | null;
-    mobile: string | null;
+    mobile?: string | null;
     selectionType?: "user" | "group" | null;
   }
   
@@ -255,7 +255,7 @@ export interface User {
     _id: string | null;
     name: string | null;
     email: string | null;
-    mobile: string | null;
+    mobile?: string | null;
     selectionType?: "user" | "group" | null;
   }
   

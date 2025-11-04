@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { View, BackHandler } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export interface BottomSheetProps {
@@ -9,17 +9,6 @@ export interface BottomSheetProps {
    * The content to render inside the bottom sheet
    */
   children: React.ReactNode;
-  /**
-   * Whether the bottom sheet is open
-   */
-  open: boolean;
-  /**
-   * Callback when the bottom sheet should close
-   */
-  onClose: () => void;
-  /**
-   * Custom snap points for the bottom sheet (defaults to ['25%', '50%', '90%'])
-   */
   snapPoints?: (string | number)[];
   /**
    * Initial snap point index (defaults to 1, which is typically '50%')
@@ -55,6 +44,12 @@ export interface BottomSheetProps {
   backdropDismissible?: boolean;
 }
 
+export interface BottomSheetRef {
+  present: () => void;
+  dismiss: () => void;
+  snapToIndex: (index: number) => void;
+}
+
 /**
  * A beautiful, reusable bottom sheet component
  * 
@@ -69,52 +64,35 @@ export interface BottomSheetProps {
  * </BottomSheetComponent>
  * ```
  */
-export function BottomSheetComponent({
-  children,
-  open,
-  onClose,
-  snapPoints = ['25%', '50%', '90%'],
-  initialSnapIndex = 1,
-  showHandle = true,
-  enablePanDownToClose = true,
-  className,
-  handleClassName,
-  backdropColor = 'rgba(0, 0, 0, 0.5)',
-  showBackdrop = true,
-  backdropDismissible = true,
-}: BottomSheetProps) {
-  const bottomSheetRef = useRef<BottomSheet>(null);
+export const BottomSheetComponent = forwardRef<BottomSheetRef, BottomSheetProps>(
+  ({children,
+    snapPoints = ['25%', '50%', '90%'],
+    initialSnapIndex = 1,
+    showHandle = true,
+    enablePanDownToClose = true,
+    className,
+    handleClassName,
+    backdropColor = 'rgba(0, 0, 0, 0.5)',
+    showBackdrop = true,
+    backdropDismissible = true}, ref) => {
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const insets = useSafeAreaInsets();
 
-  // Convert snap points to array if needed and memoize
+  const [isOpen, setIsOpen] = useState(false);
   const memoizedSnapPoints = useMemo(() => snapPoints, [snapPoints]);
 
-  // Handle sheet changes
-  const handleSheetChanges = useCallback((index: number) => {
-    if (index === -1) {
-      onClose();
-    }
-  }, [onClose]);
+  useImperativeHandle(ref, () => ({
+    present: () => {
+      bottomSheetModalRef.current?.present();
+      setIsOpen(true);
+    },
+    dismiss: () => {
+      bottomSheetModalRef.current?.dismiss();
+      setIsOpen(false);
+    },
+    snapToIndex: (index: number) => bottomSheetModalRef.current?.snapToIndex(index),
+  }) );
 
-  // Control the bottom sheet based on open prop
-  useEffect(() => {
-    if (!bottomSheetRef.current) return;
-    
-    if (open) {
-      // Ensure the component is mounted and ready before opening
-      const timer = setTimeout(() => {
-        if (bottomSheetRef.current) {
-          bottomSheetRef.current.snapToIndex(initialSnapIndex);
-        }
-      }, 50);
-      
-      return () => clearTimeout(timer);
-    } else {
-      bottomSheetRef.current.close();
-    }
-  }, [open, initialSnapIndex]);
-
-  // Custom backdrop component
   const renderBackdrop = useCallback(
     (props: any) => {
       if (!showBackdrop) return null;
@@ -137,8 +115,6 @@ export function BottomSheetComponent({
     },
     [backdropColor, showBackdrop, backdropDismissible]
   );
-
-  // Handle indicator component
   const HandleIndicator = useCallback(() => {
     if (!showHandle) return null;
 
@@ -149,52 +125,62 @@ export function BottomSheetComponent({
     );
   }, [showHandle, handleClassName]);
 
+
+  // handle back button press
+  useEffect(() => {
+    const onBackPress = () => {
+      if(isOpen) {
+        bottomSheetModalRef.current?.dismiss();
+        setIsOpen(false);
+        return true
+      }
+      return false
+    }
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress)
+    return () => backHandler.remove()
+  }, [isOpen])
+
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      index={-1}
-      snapPoints={memoizedSnapPoints}
-      onChange={handleSheetChanges}
-      enablePanDownToClose={enablePanDownToClose}
-      backdropComponent={renderBackdrop}
-      handleIndicatorStyle={{
-        display: 'none', // Hide default indicator, we'll use custom one
-      }}
-      backgroundStyle={{
-        backgroundColor: 'white',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-      }}
-      style={{
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: -2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-        elevation: 20,
-      }}
-      android_keyboardInputMode="adjustResize"
-      keyboardBehavior="interactive"
-      keyboardBlurBehavior="restore"
-    >
-      <BottomSheetView
-        style={[
-          {
-            flex: 1,
-            paddingBottom: Math.max(insets.bottom, 16),
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        snapPoints={memoizedSnapPoints}
+        enablePanDownToClose={enablePanDownToClose}
+        backdropComponent={renderBackdrop}
+        handleIndicatorStyle={{
+          display: 'none',
+        }}
+        backgroundStyle={{
+          backgroundColor: 'white',
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+        }}
+        style={{
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: -2,
           },
-        ]}
+          shadowOpacity: 0.25,
+          shadowRadius: 10,
+          elevation: 20,
+        }}
+        android_keyboardInputMode="adjustResize"
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
       >
-        <HandleIndicator />
-        <View className={cn('flex-1', className)}>
-          {children}
-        </View>
-      </BottomSheetView>
-    </BottomSheet>
+        <BottomSheetScrollView
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom, 16),
+          }}
+        >
+          <HandleIndicator />
+          <View className={cn('flex-1', className)}>
+            {children}
+          </View>
+        </BottomSheetScrollView>
+      </BottomSheetModal>
   );
-}
+});
 
 /**
  * Hook to easily manage bottom sheet state
@@ -218,7 +204,7 @@ export function useBottomSheet() {
   return {
     open,
     onOpen,
-    onClose,
+    onClose
   };
 }
 

@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
-import { Groups, Group } from '../../../types';
 import { getGroups } from '../../../services/apiServices';
+import { Group, Groups } from '../../../types';
 import { useReceiver } from '../../../zustand/receiver.store';
 export default function GroupsScreen() {
   const { data: groups, isLoading } = useQuery<Groups>({
@@ -67,11 +67,9 @@ export default function GroupsScreen() {
         renderItem={renderGroupItem}
         showsVerticalScrollIndicator={false}
       />
-        <View className="absolute bottom-10 right-10 p-4 bg-gray-200 rounded-xl">
-          <TouchableOpacity onPress={() => router.push('/group')} className=''>
+          <TouchableOpacity onPress={() => router.push('/group')} className='absolute bottom-10 right-10 p-4 bg-gray-200 rounded-xl '>
             <Ionicons name="add" size={24} color="#007AFF" />
           </TouchableOpacity>
-        </View>
     </View>
     )
   );

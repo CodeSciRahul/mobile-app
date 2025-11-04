@@ -6,10 +6,9 @@ import { Text } from './ui/text';
 
 interface GroupInfoProps {
   group: Group;
-  onClose?: () => void;
 }
 
-export default function GroupInfo({ group, onClose }: GroupInfoProps) {
+export default function GroupInfo({ group }: GroupInfoProps) {
   const { data: userInfo } = useUserInfo();
   const members = group.members || [];
   const admins = members.filter((m) => m.role === 'admin');

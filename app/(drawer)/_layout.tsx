@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function DrawerLayout() {
     return (
-        <SafeAreaView className="flex-1 bg-green-800">
+        <SafeAreaView className="flex-1 bg-blue-400">
         <AuthGuard>
             <Drawer
             screenOptions={{

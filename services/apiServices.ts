@@ -129,7 +129,6 @@ export const upload = async (data: any) => {
 export const getGroups = async () => {
     try {
         const response = await custom_axios.get("/groups");
-        console.log("get groups response", response.data);
         return response;
     } catch (error) {
         console.log("get groups error", error);
@@ -140,7 +139,6 @@ export const getGroups = async () => {
 export const createGroup = async (data: any) => {
     try {
         const response = await custom_axios.post("/groups", data);
-        console.log("create group response", response.data);
         return response;
     } catch (error) {
         console.log("create group error", error);
@@ -151,7 +149,6 @@ export const createGroup = async (data: any) => {
 export const addGroupMember = async (groupId: string, data: any) => {
     try {
         const response = await custom_axios.post(`/groups/${groupId}/members`, data);
-        console.log("add group member response", response.data);
         return response;
     } catch (error) {
         console.log("add group member error", error);
@@ -173,7 +170,6 @@ export const removeGroupMember = async (groupId: string, memberId: string) => {
 export const getGroupDetails = async (groupId: string) => {
     try {
         const response = await custom_axios.get(`/groups/${groupId}`);
-        console.log("get group details response", response.data);
         return response;
     } catch (error) {
         console.log("get group details error", error);

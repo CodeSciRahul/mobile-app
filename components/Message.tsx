@@ -1,20 +1,22 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { FlatList, Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
 
 import { useUserInfo } from '../hooks/useAuth';
 
+import * as Haptics from 'expo-haptics';
+import { Reply } from 'lucide-react-native';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, {
+    interpolate,
+    runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring
+} from 'react-native-reanimated';
 import { Reaction, ServerMessage } from '../types';
 import Popover from './popover';
-import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Reply } from 'lucide-react-native';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withSpring,
-    interpolate,
-    runOnJS
-} from 'react-native-reanimated';
+import { BottomSheetComponent, BottomSheetRef } from './ui/bottom-sheet';
 
 
 interface MessageProps {
@@ -31,26 +33,34 @@ export default function Message({ item, setIsReplyTo, selectedMessage, setSelect
     const translateX = useSharedValue(0); // ye indepenendt swip ke liye required nhi to animation sabhe message show krne lagega.
     const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false)
     const [isDoubleTap, setIsDoubleTap] = useState<boolean>(false)
-
+    const bottomSheetRef = useRef<BottomSheetRef>(null);
     const doubleTap = Gesture.Tap()
         .numberOfTaps(2)
         .maxDelay(300)
+        .maxDeltaY(10)
         .onEnd(() => {
             runOnJS(setSelectedMessage)((item))
-            console.log("double tab detect")
+            runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         });
-
+    
 
     const panGesture = Gesture.Pan()
+        // Require a clear horizontal intent to activate, which means the user has to swipe the message to the left or right.
+        .activeOffsetX([-20, 20])
+        // If vertical motion exceeds this, fail so FlatList can scroll
+        .failOffsetY([-10, 10])
+        // Minimum distance the user needs to swipe the message to the left or right.
+        .minDistance(12)
         .onUpdate((e) => {
             if (e.translationX > 0) {
                 translateX.value = e.translationX;
             }
         })
-        .onEnd(() => {
+        .onEnd(async () => {
             if (translateX.value > 50) {
                 runOnJS(setIsReplyTo)(true)
                 runOnJS(setSelectedMessage)((item))
+                runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
             }
             translateX.value = withSpring(0, { damping: 15 });
         });
@@ -79,7 +89,7 @@ export default function Message({ item, setIsReplyTo, selectedMessage, setSelect
             <View className="flex-row flex-wrap mt-1">
                 {Object.entries(reactionCounts).map(([emoji, count]) => (
                     <View key={emoji} className="">
-                        <Text className="text-md">
+                        <Text className="text-xl">
                             {emoji as string}
                         </Text>
                     </View>
@@ -156,6 +166,7 @@ export default function Message({ item, setIsReplyTo, selectedMessage, setSelect
                             onLongPress={() => {
                                 setSelectedMessage(item)
                                 setIsPopoverOpen(true)
+                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             }}
                             delayLongPress={400}
                             className={`mb-3 ${isMyMsg ? 'items-end' : 'items-start'} ${selectedMessage?._id === item._id && `bg-green-100 rounded-lg p-1 ${!isMyMsg ? 'border-l-4 border-green-500' : 'border-r-4 border-green-500'}`}`}
@@ -195,7 +206,9 @@ export default function Message({ item, setIsReplyTo, selectedMessage, setSelect
 
                                 {/* Reactions */}
                                 <View className="absolute bottom-[-7px] left-1">
-                                    {renderReactions(item?.reactions || [])}
+                                    <TouchableOpacity onPress={() => bottomSheetRef.current?.present()}>
+                                        {renderReactions(item?.reactions || [])}
+                                    </TouchableOpacity>
                                 </View>
                             </Animated.View>
 
@@ -219,6 +232,37 @@ export default function Message({ item, setIsReplyTo, selectedMessage, setSelect
                 onDelete={() => { }}
                 onCopy={() => { }}
             />}
+
+            <BottomSheetComponent
+                snapPoints={['50%']}
+                initialSnapIndex={0}
+                ref={bottomSheetRef}
+            >
+                <FlatList
+                    data={item?.reactions || []}
+                    renderItem={({ item }: { item: Reaction }) => (
+                        <View className="px-3 py-2 flex-row items-center justify-between">
+                            <Text className="text-3xl mr-3">{item.emoji}</Text>
+                            <View className="flex-1">
+                                <Text className="text-base font-semibold text-gray-900">{item.user.name}</Text>
+                                <Text className="text-xs text-gray-500 mt-0.5">{
+                                    new Date(item?.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                }</Text>
+                            </View>
+                          {item.user._id === userInfo?._id && <TouchableOpacity
+                                className="p-2 rounded-full"
+                                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                activeOpacity={0.7}
+                            >
+                                <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                            </TouchableOpacity>}
+                        </View>
+                    )}
+                    keyExtractor={(item) => item._id} 
+                    showsVerticalScrollIndicator={false}
+                    nestedScrollEnabled = {true}
+                />
+            </BottomSheetComponent>
         </>
     );
 }

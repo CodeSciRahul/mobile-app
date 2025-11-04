@@ -1,10 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/input";
+import { signup } from "../services/apiServices";
 
 export default function SignUpScreen() {
     const [name, setName] = useState("");
@@ -13,7 +15,28 @@ export default function SignUpScreen() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+
+    const {mutate: signupMutation, isPending: isLoading} = useMutation({
+        mutationFn: async ({ name, email, password }: { name: string; email: string; password: string }) => 
+            await signup({ name, email, password }),
+        onSuccess: (response) => {
+            console.log("Signup successful", response.data);
+            Alert.alert(
+                "Success", 
+                "Account created successfully! Please sign in.",
+                [
+                    {
+                        text: "OK",
+                        onPress: () => router.replace("/login")
+                    }
+                ]
+            );
+        },
+        onError: (error: any) => {
+            console.error("Signup error:", error);
+            Alert.alert("Error", error.response?.data?.message || "Signup failed. Please try again.");
+        }
+    });
 
     const handleSignUp = async () => {
         if (!name || !email || !password || !confirmPassword) {
@@ -36,30 +59,7 @@ export default function SignUpScreen() {
             return;
         }
 
-        setIsLoading(true);
-        
-        try {
-            // TODO: Implement actual signup logic here
-            console.log("Signup attempt:", { name, email, password });
-            
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            Alert.alert(
-                "Success", 
-                "Account created successfully! Please sign in.",
-                [
-                    {
-                        text: "OK",
-                        onPress: () => router.replace("/login")
-                    }
-                ]
-            );
-        } catch (error) {
-            Alert.alert("Error", "Signup failed. Please try again.");
-        } finally {
-            setIsLoading(false);
-        }
+        signupMutation({ name, email, password });
     };
 
     const handleLogin = () => {
@@ -160,9 +160,9 @@ export default function SignUpScreen() {
                                 <Button
                                     onPress={handleSignUp}
                                     disabled={isLoading}
-                                    className="w-full"
+                                    className="w-full bg-blue-600 text-white"
                                 >
-                                    <Text>{isLoading ? "Creating Account..." : "Create Account"}</Text>
+                                    <Text className="text-white text-center font-bold">{isLoading ? "Creating Account..." : "Create Account"}</Text>
                                 </Button>
                             </View>
                         </View>
