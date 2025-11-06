@@ -87,7 +87,7 @@ export default function GroupInfo({ group }: GroupInfoProps) {
               <View className="flex-1">
                 <Text className="text-base font-semibold text-gray-900">Privacy</Text>
                 <Text className="text-sm text-gray-500">
-                  {group.settings?.isPrivate ? 'Private Group' : 'Public Group'}
+                  {group.settings?.isPrivate ? 'Only admin can edit group details' : 'Member can edit group details'}
                 </Text>
               </View>
             </View>

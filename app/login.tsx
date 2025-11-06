@@ -18,11 +18,8 @@ export default function LoginScreen() {
         mutationFn: async ({ email, password }: { email: string; password: string }) => 
             await signin(email, password),
         onSuccess: async (response) => {
-            console.log("login successfully", response.data)
             const token = response.data.token;
-            const userInfo = response.data.user;
-            console.log("userInfo", userInfo);
-            console.log("token", token);
+            const userInfo = response.data.user
             await storeAuthData(token, userInfo);
             router.replace("/(drawer)/(tab)/contacts")
         },

@@ -19,7 +19,6 @@ export const socketHandlers = {
     messageId: string,
     emoji: string,
     userId: string,
-    setSelectedMessageId: (messageId: string | null) => void,
     groupId?: string
   ) => {
     if (!socket.connected) {
@@ -27,25 +26,18 @@ export const socketHandlers = {
       return;
     }
     socket.emit("add_reaction", { messageId, userId, emoji, groupId });
-    setSelectedMessageId(null);
   },
 
   // Remove a reaction from a message
   removeReaction: (
     messageId: string,
     reactionId: string,
-    setSelectedMessageId: (messageId: string | null) => void,
-    setSelectedReaction: (reactions: Reaction[] | null) => void,
-    setIsRemoveReactionOpen: (isRemoveReactionOpen: boolean) => void,
   ) => {
     if (!socket.connected) {
       toast.error("Socket is not connected - Cannot remove reaction");
       return;
     }
     socket.emit("remove_reaction", { messageId, reactionId });
-    setSelectedMessageId(null);
-    setSelectedReaction(null);
-    setIsRemoveReactionOpen(false);
   },
 
   // Send a message

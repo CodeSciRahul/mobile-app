@@ -75,6 +75,31 @@ export const verifyUser = async (token: string | null) => {
     }
 }
 
+export const updateUserProfile = async(data: {name?: string, email?: string, mobile?: string, profilePic?: string}) => {
+    try {
+        const response = await custom_axios.put("/profile", data)
+        return response
+    } catch (error) {
+        throw error
+    }
+
+}
+
+// multipart variant for profile update with image file
+export const updateUserProfileMultipart = async (formData: FormData) => {
+    try {
+        const response = await custom_axios.put("/profile", formData, {
+            headers: {
+                // override default JSON header for this request only
+                "Content-Type": "multipart/form-data",
+            },
+        })
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
 //get receivers
 export const getReceivers = async () => {
     try {

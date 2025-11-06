@@ -27,10 +27,10 @@ export default function UpdateGroupScreen() {
     isPrivateGroup: boolean;
     allowMemberInvite: boolean;
     adminOnlyMessages: boolean;
-  }>({ 
-    isPrivateGroup: false, 
-    allowMemberInvite: false, 
-    adminOnlyMessages: false 
+  }>({
+    isPrivateGroup: false,
+    allowMemberInvite: false,
+    adminOnlyMessages: false
   });
 
   const { data: groupDetails, isLoading: isLoadingGroup } = useQuery<GroupDetailsResponse>({
@@ -68,12 +68,11 @@ export default function UpdateGroupScreen() {
       Toast.show({ type: 'success', text1: 'Group updated successfully' });
       queryClient.invalidateQueries({ queryKey: ['groupDetails', groupId] });
       queryClient.invalidateQueries({ queryKey: ['groups'] });
-      router.back();
     },
     onError: (error) => {
-      Toast.show({ 
-        type: 'error', 
-        text1: (error as AxiosError<{ message: string }>)?.response?.data?.message || 'Failed to update group' 
+      Toast.show({
+        type: 'error',
+        text1: (error as AxiosError<{ message: string }>)?.response?.data?.message || 'Failed to update group'
       });
     },
   });
@@ -123,25 +122,7 @@ export default function UpdateGroupScreen() {
           <Ionicons name="alert-circle-outline" size={64} color="#EF4444" />
           <Text className="mt-4 text-xl font-bold text-gray-900">Group not found</Text>
           <Text className="mt-2 text-center text-gray-600">The group you're looking for doesn't exist or you don't have access to it.</Text>
-          <Button 
-            className="mt-6 bg-blue-500 px-6 py-3 rounded-lg"
-            onPress={() => router.back()}
-          >
-            <Text className="text-white font-semibold">Go Back</Text>
-          </Button>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <SafeAreaView className="flex-1 bg-white">
-        <View className="flex-1 items-center justify-center px-4">
-          <Ionicons name="lock-closed" size={64} color="#F59E0B" />
-          <Text className="mt-4 text-xl font-bold text-gray-900">Access Denied</Text>
-          <Text className="mt-2 text-center text-gray-600">Only group administrators can update group settings.</Text>
-          <Button 
+          <Button
             className="mt-6 bg-blue-500 px-6 py-3 rounded-lg"
             onPress={() => router.back()}
           >
@@ -154,79 +135,86 @@ export default function UpdateGroupScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
-        <ScrollView 
+        <ScrollView
           className="flex-1 px-4"
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
           <View className="py-4">
-            <View className="items-center mb-6">
-              {groupDetails.group.profilePicture ? (
-                <Image
-                  source={{ uri: groupDetails.group.profilePicture }}
-                  className="w-24 h-24 rounded-full mb-4"
+            {/* agar group private h to group detalis name, description, profile sirf admin hi change kr skta h otherwise koi bhi kr skta h  */}
+            <View>
+              <View className="items-center mb-6">
+                {groupDetails.group.profilePicture ? (
+                  <Image
+                    source={{ uri: groupDetails.group.profilePicture }}
+                    className="w-24 h-24 rounded-full mb-4"
+                  />
+                ) : (
+                  <View className="w-24 h-24 rounded-full bg-blue-500 items-center justify-center mb-4">
+                    <Text className="text-white text-4xl font-bold">
+                      {groupDetails.group.name?.charAt(0)?.toUpperCase() || 'G'}
+                    </Text>
+                  </View>
+                )}
+                <Text className="text-sm text-gray-500 mb-6">Group Profile Picture</Text>
+              </View>
+
+              <View className="mb-6">
+                <Text className="text-sm font-semibold text-gray-700 mb-2">Group Name</Text>
+                <Input
+                  placeholder="Enter group name"
+                  value={groupName}
+                  onChangeText={setGroupName}
+                  className="bg-gray-50 border-gray-200"
                 />
-              ) : (
-                <View className="w-24 h-24 rounded-full bg-blue-500 items-center justify-center mb-4">
-                  <Text className="text-white text-4xl font-bold">
-                    {groupDetails.group.name?.charAt(0)?.toUpperCase() || 'G'}
-                  </Text>
-                </View>
-              )}
-              <Text className="text-sm text-gray-500 mb-6">Group Profile Picture</Text>
+              </View>
+
+              <View className="mb-6">
+                <Text className="text-sm font-semibold text-gray-700 mb-2">Description</Text>
+                <Input
+                  placeholder="Enter group description (optional)"
+                  value={groupDescription}
+                  onChangeText={setGroupDescription}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                  className="bg-gray-50 border-gray-200 min-h-[80px]"
+                />
+              </View>
             </View>
 
-            <View className="mb-6">
-              <Text className="text-sm font-semibold text-gray-700 mb-2">Group Name</Text>
-              <Input 
-                placeholder="Enter group name" 
-                value={groupName} 
-                onChangeText={setGroupName}
-                className="bg-gray-50 border-gray-200"
-              />
-            </View>
+            {/* group setting sirf admin hi change kr skta h  */}
+            <View className="mt-6">
+              <View className="mb-4">
+              <Text className="text-lg font-bold text-gray-900">Group Settings</Text>
+              <Text className="text-xs text-gray-500">Only Admin can change the group settings</Text>
+              </View>
 
-            <View className="mb-6">
-              <Text className="text-sm font-semibold text-gray-700 mb-2">Description</Text>
-              <Input 
-                placeholder="Enter group description (optional)" 
-                value={groupDescription} 
-                onChangeText={setGroupDescription}
-                multiline
-                numberOfLines={3}
-                textAlignVertical="top"
-                className="bg-gray-50 border-gray-200 min-h-[80px]"
-              />
-            </View>
-
-            <View className="mb-6">
-              <Text className="text-lg font-bold text-gray-900 mb-4">Group Settings</Text>
-              
               <View className="bg-gray-50 rounded-lg p-4">
                 <View className="flex-row items-center justify-between py-2">
                   <View className="flex-row items-center flex-1">
                     <View className="w-10 h-10 rounded-full bg-purple-100 items-center justify-center mr-3">
-                      <Ionicons 
-                        name={groupSettings.isPrivateGroup ? 'lock-closed' : 'lock-open'} 
-                        size={20} 
-                        color={groupSettings.isPrivateGroup ? '#8B5CF6' : '#10B981'} 
+                      <Ionicons
+                        name={groupSettings.isPrivateGroup ? 'lock-closed' : 'lock-open'}
+                        size={20}
+                        color={groupSettings.isPrivateGroup ? '#8B5CF6' : '#10B981'}
                       />
                     </View>
                     <View className="flex-1">
-                      <Label 
-                        nativeID="private-group" 
-                        htmlFor="private-group" 
+                      <Label
+                        nativeID="private-group"
+                        htmlFor="private-group"
                         onPress={() => onSettingsPress('isPrivateGroup')}
                         className="text-base font-semibold text-gray-900"
                       >
                         Private Group
                       </Label>
                       <Text className="text-sm text-gray-500">
-                        Only admins can change settings
+                        Only admins can change group details
                       </Text>
                     </View>
                   </View>
@@ -236,22 +224,23 @@ export default function UpdateGroupScreen() {
                     id="private-group"
                     nativeID="private-group"
                     className="bg-blue-500"
+                    disabled={!isAdmin}
                   />
                 </View>
 
                 <View className="flex-row items-center justify-between py-2">
                   <View className="flex-row items-center flex-1">
                     <View className="w-10 h-10 rounded-full bg-green-100 items-center justify-center mr-3">
-                      <Ionicons 
-                        name={groupSettings.allowMemberInvite ? 'person-add' : 'person-remove'} 
-                        size={20} 
-                        color={groupSettings.allowMemberInvite ? '#10B981' : '#EF4444'} 
+                      <Ionicons
+                        name={groupSettings.allowMemberInvite ? 'person-add' : 'person-remove'}
+                        size={20}
+                        color={groupSettings.allowMemberInvite ? '#10B981' : '#EF4444'}
                       />
                     </View>
                     <View className="flex-1">
-                      <Label 
-                        nativeID="allow-member-invite" 
-                        htmlFor="allow-member-invite" 
+                      <Label
+                        nativeID="allow-member-invite"
+                        htmlFor="allow-member-invite"
                         onPress={() => onSettingsPress('allowMemberInvite')}
                         className="text-base font-semibold text-gray-900"
                       >
@@ -268,22 +257,23 @@ export default function UpdateGroupScreen() {
                     id="allow-member-invite"
                     nativeID="allow-member-invite"
                     className="bg-blue-500"
+                    disabled={!isAdmin}
                   />
                 </View>
 
                 <View className="flex-row items-center justify-between py-2">
                   <View className="flex-row items-center flex-1">
                     <View className="w-10 h-10 rounded-full bg-orange-100 items-center justify-center mr-3">
-                      <Ionicons 
-                        name={groupSettings.adminOnlyMessages ? 'chatbubble-ellipses' : 'chatbubbles'} 
-                        size={20} 
-                        color={groupSettings.adminOnlyMessages ? '#F97316' : '#10B981'} 
+                      <Ionicons
+                        name={groupSettings.adminOnlyMessages ? 'chatbubble-ellipses' : 'chatbubbles'}
+                        size={20}
+                        color={groupSettings.adminOnlyMessages ? '#F97316' : '#10B981'}
                       />
                     </View>
                     <View className="flex-1">
-                      <Label 
-                        nativeID="admin-only-messages" 
-                        htmlFor="admin-only-messages" 
+                      <Label
+                        nativeID="admin-only-messages"
+                        htmlFor="admin-only-messages"
                         onPress={() => onSettingsPress('adminOnlyMessages')}
                         className="text-base font-semibold text-gray-900"
                       >
@@ -300,6 +290,7 @@ export default function UpdateGroupScreen() {
                     id="admin-only-messages"
                     nativeID="admin-only-messages"
                     className="bg-blue-500"
+                    disabled={!isAdmin}
                   />
                 </View>
               </View>
@@ -317,7 +308,7 @@ export default function UpdateGroupScreen() {
             >
               <Text className="text-center text-gray-700 font-semibold">Cancel</Text>
             </Button>
-            
+
             {isUpdatingGroup ? (
               <View className="flex-1 bg-blue-500 py-3 rounded-lg items-center justify-center">
                 <ActivityIndicator size="small" color="white" />

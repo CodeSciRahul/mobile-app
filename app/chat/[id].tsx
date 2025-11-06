@@ -26,7 +26,6 @@ export default function ChatScreen() {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ServerMessage[]>([]);
   const [isReplyTo, setIsReplyTo] = useState<boolean>(false)
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState<boolean>(false)
   const [selectedMessage, setSelectedMessage] = useState<ServerMessage | null>(null)
   const router = useRouter();
   const { data: userInfo } = useUserInfo();
@@ -112,14 +111,6 @@ export default function ChatScreen() {
     setIsReplyTo(false)
   }
 
-  const onBottomSheetOpen = () => {
-    setIsBottomSheetOpen(!isBottomSheetOpen)
-  }
-
-  const onBottomSheetClose = () => {
-    setIsBottomSheetOpen(!isBottomSheetOpen)
-  }
-
   useEffect(() => {
     if (flatListRef.current && messages.length > 0) {
       (flatListRef.current as any).scrollToEnd({ animated: true })
@@ -169,6 +160,22 @@ export default function ChatScreen() {
                 </TouchableOpacity>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="mr-2 bg-white rounded-lg shadow-lg border border-gray-200">
+               {(isAdmin || (receiver?.receiver as Group).settings?.allowMemberInvite) && <DropdownMenuItem>
+                  <Ionicons name='person-add' size={24} color="#007AFF" className='mr-2'/>
+                  <Text>Add Member</Text>
+                </DropdownMenuItem>}
+                <DropdownMenuItem onPress={() => { requestAnimationFrame(() => bottomSheetRef.current?.present()); }}>
+                  <Ionicons name="information-circle-outline" size={24} color="#007AFF" className="mr-2" />
+                  <Text>Group Info</Text>
+                </DropdownMenuItem>
+               {isAdmin && <DropdownMenuItem>
+                  <Ionicons name='person-remove' size={24} color="#007AFF" className='mr-2'/>
+                  <Text>Remove Member</Text>
+                </DropdownMenuItem>}
+                {(isAdmin || !(receiver?.receiver as Group).settings?.isPrivate) && <DropdownMenuItem onPress={() => router.push(`/group/${receiver?.receiver?._id}`)}>
+                  <Ionicons name="pencil-outline" size={24} color="#007AFF" className="mr-2" />
+                  <Text>Edit Group</Text>
+                </DropdownMenuItem>}
                 {!isAdmin ? (
                   <>
                     <DropdownMenuItem>
@@ -184,14 +191,6 @@ export default function ChatScreen() {
                     </DropdownMenuItem>
                   </>
                 )}
-                <DropdownMenuItem onPress={() => { requestAnimationFrame(() => bottomSheetRef.current?.present()); }}>
-                  <Ionicons name="information-circle-outline" size={24} color="#007AFF" className="mr-2" />
-                  <Text>Group Info</Text>
-                </DropdownMenuItem>
-                {(!(receiver?.receiver as Group)?.settings?.isPrivate || isAdmin) && <DropdownMenuItem onPress={() => router.push(`/group/${receiver?.receiver?._id}`)}>
-                  <Ionicons name="pencil-outline" size={24} color="#007AFF" className="mr-2" />
-                  <Text>Edit Group</Text>
-                </DropdownMenuItem>}
               </DropdownMenuContent>
             </DropdownMenu>}
           </View>
@@ -266,7 +265,7 @@ export default function ChatScreen() {
             </View>
 
             {((selectionType === 'group' &&
-              ((receiver?.receiver as Group)?.settings?.adminOnlyMessages) || (receiver?.receiver as Group)?.members?.some((member) => member.user._id === userInfo?._id && member.role === 'admin')
+              (!(receiver?.receiver as Group)?.settings?.adminOnlyMessages) || isAdmin
             ) ||
               (selectionType === 'private') ? (
               <>

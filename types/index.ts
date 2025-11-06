@@ -4,6 +4,7 @@
 
 export interface User {
     _id: string;
+    profilePic?: string;
     name: string;
     email: string;
     mobile?: string;
@@ -18,6 +19,7 @@ export interface User {
   export interface AuthUser {
     _id: string | null;
     name: string | null;
+    profilePic?: string;
     email: string | null;
     mobile?: string | null;
     isVerified: boolean;

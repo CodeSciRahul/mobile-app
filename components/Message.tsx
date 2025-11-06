@@ -1,11 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
-import { FlatList, Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Button, FlatList, Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
 
 import { useUserInfo } from '../hooks/useAuth';
 
+import { socketHandlers } from '@/services/socketService';
 import * as Haptics from 'expo-haptics';
 import { Reply } from 'lucide-react-native';
+import EmojiSelector from 'react-native-emoji-selector';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
     interpolate,
@@ -17,6 +19,8 @@ import Animated, {
 import { Reaction, ServerMessage } from '../types';
 import Popover from './popover';
 import { BottomSheetComponent, BottomSheetRef } from './ui/bottom-sheet';
+import { Button as ButtonUI } from './ui/Button';
+import { PopoverContent, Popover as PopoverUI, PopoverTrigger, } from './ui/popover';
 
 
 interface MessageProps {
@@ -42,7 +46,7 @@ export default function Message({ item, setIsReplyTo, selectedMessage, setSelect
             runOnJS(setSelectedMessage)((item))
             runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         });
-    
+
 
     const panGesture = Gesture.Pan()
         // Require a clear horizontal intent to activate, which means the user has to swipe the message to the left or right.
@@ -154,6 +158,14 @@ export default function Message({ item, setIsReplyTo, selectedMessage, setSelect
         );
     };
 
+    const handleRemoveReaction = (reactionId: string) => {
+        socketHandlers.removeReaction(item._id, reactionId)
+    }
+
+    // const handleAddReaction = (emoji: string) => {
+    //     socketHandlers.addReaction(item._id, emoji)
+    // }
+
     return (
         <>
             <GestureHandlerRootView>
@@ -240,27 +252,28 @@ export default function Message({ item, setIsReplyTo, selectedMessage, setSelect
             >
                 <FlatList
                     data={item?.reactions || []}
-                    renderItem={({ item }: { item: Reaction }) => (
+                    renderItem={({ item: reaction }: { item: Reaction }) => (
                         <View className="px-3 py-2 flex-row items-center justify-between">
-                            <Text className="text-3xl mr-3">{item.emoji}</Text>
+                            <Text className="text-3xl mr-3">{reaction.emoji}</Text>
                             <View className="flex-1">
-                                <Text className="text-base font-semibold text-gray-900">{item.user.name}</Text>
+                                <Text className="text-base font-semibold text-gray-900">{reaction.user.name}</Text>
                                 <Text className="text-xs text-gray-500 mt-0.5">{
                                     new Date(item?.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                                 }</Text>
                             </View>
-                          {item.user._id === userInfo?._id && <TouchableOpacity
+                            {reaction.user._id === userInfo?._id && <TouchableOpacity
                                 className="p-2 rounded-full"
                                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                                 activeOpacity={0.7}
+                                onPress={() => handleRemoveReaction(reaction._id)}
                             >
                                 <Ionicons name="trash-outline" size={20} color="#EF4444" />
                             </TouchableOpacity>}
                         </View>
                     )}
-                    keyExtractor={(item) => item._id} 
+                    keyExtractor={(item) => item._id}
                     showsVerticalScrollIndicator={false}
-                    nestedScrollEnabled = {true}
+                    nestedScrollEnabled={true}
                 />
             </BottomSheetComponent>
         </>
