@@ -40,7 +40,7 @@ export default function CreateGroupScreen() {
   }>({ isPrivateGroup: false, allowMemberInvite: false, adminOnlyMessages: false });
 
   const {mutate: createGroupMutation, isPending: isCreatingGroup} = useMutation({
-    mutationFn: async (payload: { name: string, description: string, settings: { isPrivateGroup: boolean, allowMemberInvite: boolean, adminOnlyMessages: boolean }, members: string[] }) => {
+    mutationFn: async (payload: { name: string, description: string, settings: { isPrivateGroup: boolean, allowMemberInvite: boolean, adminOnlyMessages: boolean }, memberEmails: string[] }) => {
       const response = await createGroup(payload);
       return response.data;
     },
@@ -85,7 +85,7 @@ export default function CreateGroupScreen() {
       name: groupName, 
       description: groupDescription, 
       settings: groupSettings, 
-      members: selectedReceivers 
+      memberEmails: selectedReceivers 
     });
   }
 
@@ -158,7 +158,7 @@ export default function CreateGroupScreen() {
             />
           </View>
 
-          <View className="mb-6">
+          <View className="my-6">
             <Text className="text-lg font-bold text-gray-900 mb-4">Group Settings</Text>
             
             <View className="bg-gray-50 rounded-lg p-4">

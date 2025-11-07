@@ -8,14 +8,15 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, KeyboardAvoidingView, Modal, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import AuthGuard from '../../components/AuthGuard';
 import { useUserInfo } from '../../hooks/useAuth';
-import { getChats } from '../../services/apiServices';
+import { deleteGroup, getChats, leaveGroup } from '../../services/apiServices';
 import { cleanupSocketListeners, setupSocketListeners, socketHandlers } from "../../services/socketService";
 import { Group, ServerMessage } from '../../types';
 import { useReceiver } from '../../zustand/receiver.store';
@@ -33,7 +34,9 @@ export default function ChatScreen() {
   const selectionType = receiver?.selectionType;
   const insets = useSafeAreaInsets();
   const isAdmin = (receiver?.receiver as Group)?.members?.some((member) => member.user._id === userInfo?._id && member.role === 'admin');
+  const isOwner = (receiver?.receiver as Group).createdBy._id === userInfo?._id
   const bottomSheetRef = useRef<BottomSheetRef>(null);
+  const queryClient = useQueryClient()
   const { data: chats, isLoading } = useQuery<ServerMessage[]>({
     queryKey: ['chats', receiverId, selectionType],
     queryFn: () => {
@@ -118,6 +121,40 @@ export default function ChatScreen() {
 
   }, [messages])
 
+  const { mutate: leaveGroupMutation, isPending: isLeavingGroup } = useMutation({
+    mutationFn: async (groupId: string) => {
+      const response = await leaveGroup(groupId)
+      return response
+    },
+    onSuccess: (data) => {
+      Toast.show({
+        type: "success",
+        text1: "You have left the group successfully."
+      })
+      router.back()
+      queryClient.invalidateQueries({
+        queryKey: ["groups"]
+      })
+    }
+  })
+
+  const { mutate: deleteGroupMutation, isPending: isDeletingGroup } = useMutation({
+    mutationFn: async (groupId: string) => {
+      const response = await deleteGroup(groupId)
+      return response.data
+    },
+    onSuccess: () => {
+      Toast.show({
+        type: "success",
+        text1: "Group has been deleted successfully"
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["groups"]
+      })
+      router.back()
+    }
+  })
+
 
   return (
     <SafeAreaView className='flex-1 bg-blue-400' edges={['top', 'left', 'right']}>
@@ -160,34 +197,58 @@ export default function ChatScreen() {
                 </TouchableOpacity>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="mr-2 bg-white rounded-lg shadow-lg border border-gray-200">
-               {(isAdmin || (receiver?.receiver as Group).settings?.allowMemberInvite) && <DropdownMenuItem>
-                  <Ionicons name='person-add' size={24} color="#007AFF" className='mr-2'/>
+                {(isAdmin || isOwner || (receiver?.receiver as Group).settings?.allowMemberInvite) && <DropdownMenuItem>
+                  <Ionicons name='person-add' size={24} color="#007AFF" className='mr-2' />
                   <Text>Add Member</Text>
                 </DropdownMenuItem>}
                 <DropdownMenuItem onPress={() => { requestAnimationFrame(() => bottomSheetRef.current?.present()); }}>
                   <Ionicons name="information-circle-outline" size={24} color="#007AFF" className="mr-2" />
                   <Text>Group Info</Text>
                 </DropdownMenuItem>
-               {isAdmin && <DropdownMenuItem>
-                  <Ionicons name='person-remove' size={24} color="#007AFF" className='mr-2'/>
+                {(isAdmin || isOwner) && <DropdownMenuItem>
+                  <Ionicons name='person-remove' size={24} color="#007AFF" className='mr-2' />
                   <Text>Remove Member</Text>
                 </DropdownMenuItem>}
-                {(isAdmin || !(receiver?.receiver as Group).settings?.isPrivate) && <DropdownMenuItem onPress={() => router.push(`/group/${receiver?.receiver?._id}`)}>
+                {(isAdmin || isOwner || !(receiver?.receiver as Group).settings?.isPrivate) && <DropdownMenuItem onPress={() => router.push(`/group/${receiver?.receiver?._id}`)}>
                   <Ionicons name="pencil-outline" size={24} color="#007AFF" className="mr-2" />
                   <Text>Edit Group</Text>
                 </DropdownMenuItem>}
-                {!isAdmin ? (
+                {!isOwner ? (
                   <>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      onPress={() => {
+                        if (!isLeavingGroup) {
+                          leaveGroupMutation(receiverId as string)
+                        }
+                      }}
+                      disabled={isLeavingGroup}
+                    >
                       <Ionicons name="exit-outline" size={24} color="#007AFF" className="mr-2" />
                       <Text>Leave Group</Text>
+                      {isLeavingGroup && (
+                        <View className="ml-2">
+                          <ActivityIndicator size="small" color="#007AFF" />
+                        </View>
+                      )}
                     </DropdownMenuItem>
                   </>
                 ) : (
                   <>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      onPress={() => {
+                        if (!isDeletingGroup) {
+                          deleteGroupMutation(receiverId as string)
+                        }
+                      }}
+                      disabled={isDeletingGroup}
+                    >
                       <Ionicons name="trash-outline" size={24} color="#007AFF" className="mr-2" />
                       <Text>Delete Group</Text>
+                      {isDeletingGroup && (
+                        <View className="ml-2">
+                          <ActivityIndicator size="small" color="#007AFF" />
+                        </View>
+                      )}
                     </DropdownMenuItem>
                   </>
                 )}
@@ -265,7 +326,7 @@ export default function ChatScreen() {
             </View>
 
             {((selectionType === 'group' &&
-              (!(receiver?.receiver as Group)?.settings?.adminOnlyMessages) || isAdmin
+              (!(receiver?.receiver as Group)?.settings?.adminOnlyMessages) || isAdmin || isOwner
             ) ||
               (selectionType === 'private') ? (
               <>
@@ -344,6 +405,24 @@ export default function ChatScreen() {
               </View>
             ))}
           </KeyboardAvoidingView>
+
+          {/* Loading Overlay */}
+          {(isLeavingGroup || isDeletingGroup) && (
+            <Modal
+              transparent
+              visible={isLeavingGroup || isDeletingGroup}
+              animationType="fade"
+            >
+              <View className="flex-1 bg-black/50 items-center justify-center">
+                <View className="bg-white rounded-lg p-6 items-center min-w-[200px]">
+                  <ActivityIndicator size="large" color="#007AFF" />
+                  <Text className="mt-4 text-gray-900 font-medium text-base">
+                    {isLeavingGroup ? 'Leaving group...' : 'Deleting group...'}
+                  </Text>
+                </View>
+              </View>
+            </Modal>
+          )}
         </View>
       </AuthGuard>
     </SafeAreaView>

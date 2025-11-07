@@ -41,6 +41,7 @@ export default function UpdateGroupScreen() {
     },
     enabled: !!groupId,
   });
+  console.log("groupDetails", groupDetails)
 
   useEffect(() => {
     if (groupDetails?.group) {
@@ -58,6 +59,8 @@ export default function UpdateGroupScreen() {
   const isAdmin = groupDetails?.group?.members?.some(
     (member) => member.user._id === userInfo?._id && member.role === 'admin'
   );
+
+  const isOwner = groupDetails?.group?.createdBy._id === userInfo?._id
 
   const { mutate: updateGroupMutation, isPending: isUpdatingGroup } = useMutation({
     mutationFn: async (payload: UpdateGroupData) => {
@@ -187,11 +190,11 @@ export default function UpdateGroupScreen() {
               </View>
             </View>
 
-            {/* group setting sirf admin hi change kr skta h  */}
+            {/* group setting sirf admin or owner hi change kr skta h  */}
             <View className="mt-6">
               <View className="mb-4">
               <Text className="text-lg font-bold text-gray-900">Group Settings</Text>
-              <Text className="text-xs text-gray-500">Only Admin can change the group settings</Text>
+              <Text className="text-xs text-gray-500">Only Admin or Owner can change the group settings</Text>
               </View>
 
               <View className="bg-gray-50 rounded-lg p-4">
@@ -214,7 +217,7 @@ export default function UpdateGroupScreen() {
                         Private Group
                       </Label>
                       <Text className="text-sm text-gray-500">
-                        Only admins can change group details
+                        Only admins or owner can change group details
                       </Text>
                     </View>
                   </View>
@@ -224,7 +227,7 @@ export default function UpdateGroupScreen() {
                     id="private-group"
                     nativeID="private-group"
                     className="bg-blue-500"
-                    disabled={!isAdmin}
+                    disabled={!isAdmin || !isOwner}
                   />
                 </View>
 
@@ -257,7 +260,7 @@ export default function UpdateGroupScreen() {
                     id="allow-member-invite"
                     nativeID="allow-member-invite"
                     className="bg-blue-500"
-                    disabled={!isAdmin}
+                    disabled={!isAdmin || !isOwner}
                   />
                 </View>
 
@@ -290,7 +293,7 @@ export default function UpdateGroupScreen() {
                     id="admin-only-messages"
                     nativeID="admin-only-messages"
                     className="bg-blue-500"
-                    disabled={!isAdmin}
+                    disabled={!isAdmin || !isOwner}
                   />
                 </View>
               </View>

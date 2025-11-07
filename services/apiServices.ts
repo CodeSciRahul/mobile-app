@@ -4,7 +4,7 @@ import { Properties } from "../config/properties";
 import { clearAuthData, getToken } from "../util/store";
 
 const custom_axios = axios.create({
-    baseURL: Properties.PUBLIC_API_URL,
+    baseURL: `${Properties.API_BASE_URL}/api`,
     headers: {
         "Content-Type": "application/json",
     },
@@ -227,11 +227,19 @@ export const updateGroupMemberRole = async (groupId: string, memberId: string, r
 export const leaveGroup = async (groupId: string) => {
     try {
         const response = await custom_axios.post(`/groups/${groupId}/leave`);
-        console.log("leave group response", response.data);
         return response;
     } catch (error) {
         console.log("leave group error", error);
         throw error;
+    }
+}
+
+export const deleteGroup = async (groupId: string) => {
+    try {
+        const response = await custom_axios.delete(`/groups/${groupId}`);
+        return response;
+    } catch (error) {
+        throw error
     }
 }
 

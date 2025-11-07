@@ -4,7 +4,7 @@ import io, { Socket } from "socket.io-client";
 import { Reaction, ServerMessage } from "../types";
 
 // Socket setup
-export const socket: Socket = io(Properties.PUBLIC_SOCKET_BASE_URL, {
+export const socket: Socket = io(Properties.API_BASE_URL, {
   transports: ["websocket"],
   reconnection: true,
   reconnectionDelay: 1000,

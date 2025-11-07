@@ -143,6 +143,11 @@ export interface User {
   export interface Group {
     _id: string;
     name: string;
+    createdBy: {
+      _id: string,
+      name: string,
+      email: string
+    }
     description?: string | null;
     profilePicture?: string | null;
     settings?: GroupSettings;
@@ -172,6 +177,11 @@ export interface User {
     name: string;
     description?: string;
     profilePicture?: string;
+    createdBy: {
+      _id: string,
+      name: string,
+      email: string
+    }
     settings: GroupSettings;
     members: GroupMember[];
     createdAt: string;

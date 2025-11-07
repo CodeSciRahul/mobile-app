@@ -12,6 +12,7 @@ export default function GroupInfo({ group }: GroupInfoProps) {
   const { data: userInfo } = useUserInfo();
   const members = group.members || [];
   const admins = members.filter((m) => m.role === 'admin');
+  const isOwner = group.createdBy._id === userInfo?._id
   const participants = members.filter((m) => m.role === 'participant');
   const currentUserMember = members.find((m) => m.user._id === userInfo?._id);
 
@@ -160,7 +161,12 @@ export default function GroupInfo({ group }: GroupInfoProps) {
               Administrators ({admins.length})
             </Text>
             {admins.map((member) => (
-              <MemberItem key={member._id} member={member} isCurrentUser={member.user._id === userInfo?._id} />
+              <MemberItem 
+                key={member._id} 
+                member={member} 
+                isCurrentUser={member.user._id === userInfo?._id}
+                isOwner={member.user._id === group.createdBy._id}
+              />
             ))}
           </View>
         )}
@@ -172,7 +178,11 @@ export default function GroupInfo({ group }: GroupInfoProps) {
               Participants ({participants.length})
             </Text>
             {participants.map((member) => (
-              <MemberItem key={member._id} member={member} isCurrentUser={member.user._id === userInfo?._id} />
+              <MemberItem 
+                key={member._id} 
+                member={member} 
+                isCurrentUser={member.user._id === userInfo?._id}
+              />
             ))}
           </View>
         )}
@@ -184,9 +194,10 @@ export default function GroupInfo({ group }: GroupInfoProps) {
 interface MemberItemProps {
   member: GroupMember;
   isCurrentUser?: boolean;
+  isOwner?: boolean;
 }
 
-function MemberItem({ member, isCurrentUser }: MemberItemProps) {
+function MemberItem({ member, isCurrentUser, isOwner }: MemberItemProps) {
   return (
     <View className="flex-row items-center py-3 border-b border-gray-50">
       {/* Avatar */}
@@ -219,14 +230,24 @@ function MemberItem({ member, isCurrentUser }: MemberItemProps) {
       </View>
 
       {/* Role Badge */}
-      {member.role === 'admin' && (
-        <View className="bg-purple-100 px-3 py-1 rounded-full">
-          <View className="flex-row items-center">
-            <Ionicons name="shield-checkmark" size={14} color="#8B5CF6" />
-            <Text className="text-xs font-semibold text-purple-600 ml-1">Admin</Text>
+      <View className="flex-row items-center gap-2">
+        {isOwner && (
+          <View className="bg-amber-100 px-3 py-1 rounded-full">
+            <View className="flex-row items-center">
+              <Ionicons name="star" size={14} color="#D97706" />
+              <Text className="text-xs font-semibold text-amber-700 ml-1">Owner</Text>
+            </View>
           </View>
-        </View>
-      )}
+        )}
+        {member.role === 'admin' && (
+          <View className="bg-purple-100 px-3 py-1 rounded-full">
+            <View className="flex-row items-center">
+              <Ionicons name="shield-checkmark" size={14} color="#8B5CF6" />
+              <Text className="text-xs font-semibold text-purple-600 ml-1">Admin</Text>
+            </View>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
