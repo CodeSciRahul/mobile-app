@@ -21,7 +21,16 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png",
         "backgroundColor": "#E6F4FE"
       },
-      "permissions": [],
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.ACCESS_MEDIA_LOCATION",
+        "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": true,
       "softwareKeyboardLayoutMode": "resize",
@@ -64,7 +73,10 @@
           "photosPermission": "Allow Convoo to access your photos.",
           "savePhotosPermission": "Allow Convoo to save photos.",
           "isAccessMediaLocationEnabled": true,
-          "granularPermissions": ["audio", "photo"]
+          "granularPermissions": [
+            "audio",
+            "photo"
+          ]
         }
       ],
       [
@@ -73,15 +85,15 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
     },
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": "replace-with-your-eas-project-id"
+        "projectId": "b01ccf78-9036-45cb-9fa6-7147e49aacfc"
       }
     }
   }
