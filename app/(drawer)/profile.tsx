@@ -310,7 +310,7 @@ export default function ProfileScreen() {
               reset()
               setImage(userInfo?.profilePic)
             }}
-            disabled={!isPending}
+            disabled={isPending}
           >
             <Text className="text-slate-700 dark:text-slate-200 text-center font-semibold text-base">
               Cancel

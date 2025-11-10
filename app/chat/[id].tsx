@@ -33,8 +33,8 @@ export default function ChatScreen() {
   const { receiver } = useReceiver();
   const selectionType = receiver?.selectionType;
   const insets = useSafeAreaInsets();
-  const isAdmin = (receiver?.receiver as Group)?.members?.some((member) => member.user._id === userInfo?._id && member.role === 'admin');
-  const isOwner = (receiver?.receiver as Group).createdBy._id === userInfo?._id
+  const isAdmin = (receiver?.receiver as Group)?.members?.some((member) => member?.user?._id === userInfo?._id && member.role === 'admin');
+  const isOwner = (receiver?.receiver as Group)?.createdBy?._id === userInfo?._id
   const bottomSheetRef = useRef<BottomSheetRef>(null);
   const queryClient = useQueryClient()
   const { data: chats, isLoading } = useQuery<ServerMessage[]>({
@@ -94,7 +94,7 @@ export default function ChatScreen() {
 
     if (selectionType === 'group') {
       socketHandlers.sendMessage({
-        senderId: userInfo._id,
+        senderId: userInfo?._id,
         groupId: receiverId as string,
         content: message.trim(),
         messageType: 'group',
@@ -102,7 +102,7 @@ export default function ChatScreen() {
       });
     } else {
       socketHandlers.sendMessage({
-        senderId: userInfo._id,
+        senderId: userInfo?._id,
         receiverId: receiverId as string,
         content: message.trim(),
         messageType: 'private',
