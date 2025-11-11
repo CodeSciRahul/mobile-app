@@ -11,7 +11,7 @@ import { AxiosError } from "axios";
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView, Text, View, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
@@ -20,6 +20,8 @@ export default function UpdateGroupScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { data: userInfo } = useUserInfo();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
@@ -109,10 +111,10 @@ export default function UpdateGroupScreen() {
 
   if (isLoadingGroup) {
     return (
-      <SafeAreaView className="flex-1 bg-white">
+      <SafeAreaView className="flex-1 bg-white dark:bg-black">
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#007AFF" />
-          <Text className="mt-4 text-gray-600">Loading group details...</Text>
+          <Text className="mt-4 text-gray-600 dark:text-gray-300">Loading group details...</Text>
         </View>
       </SafeAreaView>
     );
@@ -120,11 +122,11 @@ export default function UpdateGroupScreen() {
 
   if (!groupDetails?.group) {
     return (
-      <SafeAreaView className="flex-1 bg-white">
+      <SafeAreaView className="flex-1 bg-white dark:bg-black">
         <View className="flex-1 items-center justify-center px-4">
           <Ionicons name="alert-circle-outline" size={64} color="#EF4444" />
-          <Text className="mt-4 text-xl font-bold text-gray-900">Group not found</Text>
-          <Text className="mt-2 text-center text-gray-600">The group you're looking for doesn't exist or you don't have access to it.</Text>
+          <Text className="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">Group not found</Text>
+          <Text className="mt-2 text-center text-gray-600 dark:text-gray-300">The group you're looking for doesn't exist or you don't have access to it.</Text>
           <Button
             className="mt-6 bg-blue-500 px-6 py-3 rounded-lg"
             onPress={() => router.back()}
@@ -137,15 +139,15 @@ export default function UpdateGroupScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
         <ScrollView
-          className="flex-1 px-4"
+          className="flex-1 px-4 bg-white dark:bg-[#181818]"
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          
         >
           <View className="py-4">
             {/* agar group private h to group detalis name, description, profile sirf admin hi change kr skta h otherwise koi bhi kr skta h  */}
@@ -163,21 +165,22 @@ export default function UpdateGroupScreen() {
                     </Text>
                   </View>
                 )}
-                <Text className="text-sm text-gray-500 mb-6">Group Profile Picture</Text>
+                <Text className="text-sm text-gray-500 dark:text-gray-400 mb-6">Group Profile Picture</Text>
               </View>
 
               <View className="mb-6">
-                <Text className="text-sm font-semibold text-gray-700 mb-2">Group Name</Text>
+                <Text className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Group Name</Text>
                 <Input
                   placeholder="Enter group name"
                   value={groupName}
                   onChangeText={setGroupName}
-                  className="bg-gray-50 border-gray-200"
+                  className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
+                  placeholderTextColor={isDark ? '#9CA3AF' : '#6B7280'}
                 />
               </View>
 
               <View className="mb-6">
-                <Text className="text-sm font-semibold text-gray-700 mb-2">Description</Text>
+                <Text className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Description</Text>
                 <Input
                   placeholder="Enter group description (optional)"
                   value={groupDescription}
@@ -185,7 +188,8 @@ export default function UpdateGroupScreen() {
                   multiline
                   numberOfLines={3}
                   textAlignVertical="top"
-                  className="bg-gray-50 border-gray-200 min-h-[80px]"
+                  className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 min-h-[80px] text-gray-900 dark:text-gray-100"
+                  placeholderTextColor={isDark ? '#9CA3AF' : '#6B7280'}
                 />
               </View>
             </View>
@@ -193,11 +197,11 @@ export default function UpdateGroupScreen() {
             {/* group setting sirf admin or owner hi change kr skta h  */}
             <View className="mt-6">
               <View className="mb-4">
-              <Text className="text-lg font-bold text-gray-900">Group Settings</Text>
-              <Text className="text-xs text-gray-500">Only Admin or Owner can change the group settings</Text>
+              <Text className="text-lg font-bold text-gray-900 dark:text-gray-100">Group Settings</Text>
+              <Text className="text-xs text-gray-500 dark:text-gray-400">Only Admin or Owner can change the group settings</Text>
               </View>
 
-              <View className="bg-gray-50 rounded-lg p-4">
+              <View className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                 <View className="flex-row items-center justify-between py-2">
                   <View className="flex-row items-center flex-1">
                     <View className="w-10 h-10 rounded-full bg-purple-100 items-center justify-center mr-3">
@@ -212,11 +216,11 @@ export default function UpdateGroupScreen() {
                         nativeID="private-group"
                         htmlFor="private-group"
                         onPress={() => onSettingsPress('isPrivateGroup')}
-                        className="text-base font-semibold text-gray-900"
+                        className="text-base font-semibold text-gray-900 dark:text-gray-100"
                       >
                         Private Group
                       </Label>
-                      <Text className="text-sm text-gray-500">
+                      <Text className="text-sm text-gray-500 dark:text-gray-400">
                         Only admins or owner can change group details
                       </Text>
                     </View>
@@ -245,11 +249,11 @@ export default function UpdateGroupScreen() {
                         nativeID="allow-member-invite"
                         htmlFor="allow-member-invite"
                         onPress={() => onSettingsPress('allowMemberInvite')}
-                        className="text-base font-semibold text-gray-900"
+                        className="text-base font-semibold text-gray-900 dark:text-gray-100"
                       >
                         Allow Member Invite
                       </Label>
-                      <Text className="text-sm text-gray-500">
+                      <Text className="text-sm text-gray-500 dark:text-gray-400">
                         Members can invite others
                       </Text>
                     </View>
@@ -278,11 +282,11 @@ export default function UpdateGroupScreen() {
                         nativeID="admin-only-messages"
                         htmlFor="admin-only-messages"
                         onPress={() => onSettingsPress('adminOnlyMessages')}
-                        className="text-base font-semibold text-gray-900"
+                        className="text-base font-semibold text-gray-900 dark:text-gray-100"
                       >
                         Admin Only Messages
                       </Label>
-                      <Text className="text-sm text-gray-500">
+                      <Text className="text-sm text-gray-500 dark:text-gray-400">
                         Only admins can send messages
                       </Text>
                     </View>
@@ -301,15 +305,15 @@ export default function UpdateGroupScreen() {
           </View>
         </ScrollView>
 
-        <View className="px-4 py-4 bg-white border-t border-gray-200">
+        <View className="px-4 py-4 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-700">
           <View className="flex-row gap-3">
             <Button
               variant="outline"
-              className="flex-1 py-3 rounded-lg border-gray-300"
+              className="flex-1 py-3 rounded-lg border-gray-300 dark:border-gray-600"
               onPress={() => router.back()}
               disabled={isUpdatingGroup}
             >
-              <Text className="text-center text-gray-700 font-semibold">Cancel</Text>
+              <Text className="text-center text-gray-700 dark:text-gray-200 font-semibold">Cancel</Text>
             </Button>
 
             {isUpdatingGroup ? (
@@ -328,6 +332,5 @@ export default function UpdateGroupScreen() {
           </View>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
   );
 }

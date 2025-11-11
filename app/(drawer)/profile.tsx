@@ -2,6 +2,7 @@ import { BottomSheetComponent, BottomSheetRef } from "@/components/ui/bottom-she
 import { Label } from "@/components/ui/label";
 import { useUserInfo } from "@/hooks/useAuth";
 import { updateUserProfileMultipart } from "@/services/apiServices";
+import { storeUserInfo } from "@/util/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
@@ -9,14 +10,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, useColorScheme, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import { storeUserInfo } from "@/util/store";
-import { ActivityIndicator } from "react-native";
 
 export default function ProfileScreen() {
   const { data: userInfo } = useUserInfo()
+  const colorschema = useColorScheme()
 
   const [image, setImage] = useState<undefined | string>(undefined)
   const BottomSheetRef = useRef<BottomSheetRef>(null)
@@ -152,10 +152,11 @@ export default function ProfileScreen() {
           paddingBottom: contentInsets.bottom,
           paddingLeft: contentInsets.left,
           paddingRight: contentInsets.right,
-          flexGrow: 1
+          flexGrow: 1,
+          backgroundColor: `${colorschema === "light" ? "#FFFFFF" : "#181818"}`
         }}
         keyboardShouldPersistTaps="handled"
-        className="bg-background flex-1"
+        className="bg-background dark:bg-black flex-1"
       >
         {/* Profile Header Section */}
         <View className="items-center mb-8">
@@ -205,11 +206,12 @@ export default function ProfileScreen() {
               render={({ field: { value, onChange } }) => {
                 return (
                   <>
-                    <TextInput
+                  <TextInput
                       value={value}
                       onChangeText={onChange}
                       placeholder="Enter your name"
-                      className="border-b-2 border-blue-400 bg-blue-50 p-4 rounded-md text-md"
+                      className="border-b-2 border-blue-400 bg-blue-50 dark:bg-slate-800 p-4 rounded-md text-md text-slate-900 dark:text-slate-100"
+                      placeholderTextColor={colorschema === 'dark' ? '#9CA3AF' : '#6B7280'}
                     />
                     {errors.name && (
                       <Text className="text-red-500 text-xs mt-1">{errors.name.message}</Text>
@@ -242,7 +244,8 @@ export default function ProfileScreen() {
                       placeholder="Enter your email"
                       keyboardType="email-address"
                       autoCapitalize="none"
-                      className="border-b-2 border-blue-400 bg-blue-50 p-4 rounded-md text-md"
+                      className="border-b-2 border-blue-400 bg-blue-50 dark:bg-slate-800 p-4 rounded-md text-md text-slate-900 dark:text-slate-100"
+                      placeholderTextColor={colorschema === 'dark' ? '#9CA3AF' : '#6B7280'}
                     />
                     {errors.email && (
                       <Text className="text-red-500 text-xs mt-1">{errors.email.message}</Text>
@@ -274,7 +277,8 @@ export default function ProfileScreen() {
                       onChangeText={onChange}
                       placeholder="Enter your mobile number"
                       keyboardType="phone-pad"
-                      className="border-b-2 border-blue-400 bg-blue-50 p-4 rounded-md text-md"
+                      className="border-b-2 border-blue-400 bg-blue-50 dark:bg-slate-800 p-4 rounded-md text-md text-slate-900 dark:text-slate-100"
+                      placeholderTextColor={colorschema === 'dark' ? '#9CA3AF' : '#6B7280'}
                     />
                     {errors.mobile && (
                       <Text className="text-red-500 text-xs mt-1">{errors.mobile.message}</Text>

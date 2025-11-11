@@ -1,21 +1,18 @@
 import Member from "@/components/member";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
-import { getReceivers } from "@/services/apiServices";
-import { Receiver, ReceiversResponse } from "@/types";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { ActivityIndicator, FlatList, Platform, Text, View, TouchableOpacity, ScrollView } from "react-native";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import * as Haptics from 'expo-haptics';
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-import { createGroup } from "@/services/apiServices";
-import Toast from "react-native-toast-message";
-import { AxiosError } from "axios";
-import { KeyboardAvoidingView } from "react-native";
+import { Switch } from "@/components/ui/switch";
+import { createGroup, getReceivers } from "@/services/apiServices";
+import { Receiver, ReceiversResponse } from "@/types";
 import { Ionicons } from '@expo/vector-icons';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import * as Haptics from 'expo-haptics';
 import { useRouter } from "expo-router";
+import { useState } from "react";
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function CreateGroupScreen() {
   const router = useRouter();
@@ -91,7 +88,7 @@ export default function CreateGroupScreen() {
 
   function renderProgressIndicator() {
     return (
-      <View className="px-4 pt-4 pb-2 bg-white">
+      <View className="px-4 pt-4 pb-2 bg-white dark:bg-black">
         <View className="flex-row items-center justify-between mb-3">
           <View className="flex-row items-center flex-1">
             <View className={`w-8 h-8 rounded-full items-center justify-center ${currentStep >= 1 ? 'bg-blue-500' : 'bg-gray-300'}`}>
@@ -108,10 +105,10 @@ export default function CreateGroupScreen() {
           </View>
         </View>
         <View className="flex-row justify-between px-2">
-          <Text className={`text-xs font-semibold ${currentStep >= 1 ? 'text-blue-500' : 'text-gray-400'}`}>
+          <Text className={`text-xs font-semibold ${currentStep >= 1 ? 'text-blue-500' : 'text-gray-400 dark:text-gray-500'}`}>
             Group Info
           </Text>
-          <Text className={`text-xs font-semibold ${currentStep >= 2 ? 'text-blue-500' : 'text-gray-400'}`}>
+          <Text className={`text-xs font-semibold ${currentStep >= 2 ? 'text-blue-500' : 'text-gray-400 dark:text-gray-500'}`}>
             Add Members
           </Text>
         </View>
@@ -131,22 +128,22 @@ export default function CreateGroupScreen() {
             <View className="w-16 h-16 rounded-full bg-blue-100 items-center justify-center mb-4">
               <Ionicons name="people" size={32} color="#007AFF" />
             </View>
-            <Text className="text-2xl font-bold text-gray-900 mb-2">Create New Group</Text>
-            <Text className="text-gray-600">Set up your group information and preferences</Text>
+            <Text className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Create New Group</Text>
+            <Text className="text-gray-600 dark:text-gray-300">Set up your group information and preferences</Text>
           </View>
 
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Group Name *</Text>
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Group Name *</Text>
             <Input 
               placeholder="Enter group name" 
               value={groupName} 
               onChangeText={setGroupName}
-              className="bg-gray-50 border-gray-200"
+              className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
             />
           </View>
 
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Description</Text>
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Description</Text>
             <Input 
               placeholder="Enter group description (optional)" 
               value={groupDescription} 
@@ -154,15 +151,15 @@ export default function CreateGroupScreen() {
               multiline
               numberOfLines={3}
               textAlignVertical="top"
-              className="bg-gray-50 border-gray-200 min-h-[80px]"
+              className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 min-h-[80px]"
             />
           </View>
 
           <View className="my-6">
-            <Text className="text-lg font-bold text-gray-900 mb-4">Group Settings</Text>
+            <Text className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Group Settings</Text>
             
-            <View className="bg-gray-50 rounded-lg p-4">
-              <View className="flex-row items-center justify-between py-3 border-b border-gray-200">
+            <View className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+              <View className="flex-row items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
                 <View className="flex-row items-center flex-1">
                   <View className="w-10 h-10 rounded-full bg-purple-100 items-center justify-center mr-3">
                     <Ionicons 
@@ -176,11 +173,11 @@ export default function CreateGroupScreen() {
                       nativeID="private-group" 
                       htmlFor="private-group" 
                       onPress={() => onSettingsPress('isPrivateGroup')}
-                      className="text-base font-semibold text-gray-900"
+                      className="text-base font-semibold text-gray-900 dark:text-gray-100"
                     >
                       Private Group
                     </Label>
-                    <Text className="text-sm text-gray-500">
+                    <Text className="text-sm text-gray-500 dark:text-gray-400">
                       Only admins can change settings
                     </Text>
                   </View>
@@ -194,7 +191,7 @@ export default function CreateGroupScreen() {
                 />
               </View>
 
-              <View className="flex-row items-center justify-between py-3 border-b border-gray-200">
+              <View className="flex-row items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
                 <View className="flex-row items-center flex-1">
                   <View className="w-10 h-10 rounded-full bg-green-100 items-center justify-center mr-3">
                     <Ionicons 
@@ -208,11 +205,11 @@ export default function CreateGroupScreen() {
                       nativeID="allow-member-invite" 
                       htmlFor="allow-member-invite" 
                       onPress={() => onSettingsPress('allowMemberInvite')}
-                      className="text-base font-semibold text-gray-900"
+                      className="text-base font-semibold text-gray-900 dark:text-gray-100"
                     >
                       Allow Member Invite
                     </Label>
-                    <Text className="text-sm text-gray-500">
+                    <Text className="text-sm text-gray-500 dark:text-gray-400">
                       Members can invite others
                     </Text>
                   </View>
@@ -240,11 +237,11 @@ export default function CreateGroupScreen() {
                       nativeID="admin-only-messages" 
                       htmlFor="admin-only-messages" 
                       onPress={() => onSettingsPress('adminOnlyMessages')}
-                      className="text-base font-semibold text-gray-900"
+                      className="text-base font-semibold text-gray-900 dark:text-gray-100"
                     >
                       Admin Only Messages
                     </Label>
-                    <Text className="text-sm text-gray-500">
+                    <Text className="text-sm text-gray-500 dark:text-gray-400">
                       Only admins can send messages
                     </Text>
                   </View>
@@ -266,11 +263,11 @@ export default function CreateGroupScreen() {
 
   function renderStep2() {
     return (
-      <View className="flex-1 px-4 bg-white">
-        <View className="px-4 py-4 bg-white border-b border-gray-200">
+      <View className="flex-1 px-4 bg-white dark:bg-black">
+        <View className="px-4 py-4 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-700">
           <View className="items-center justify-center mb-2">
-            <Text className="text-2xl font-bold text-gray-900 mb-2">Add Members</Text>
-            <Text className="text-gray-600">Select members to add to your group</Text>
+            <Text className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Add Members</Text>
+            <Text className="text-gray-600 dark:text-gray-300">Select members to add to your group</Text>
           </View>
           {selectedReceivers.length > 0 && (
             <View className="mt-3 bg-blue-50 rounded-lg px-3 py-2 flex-row items-center">
@@ -285,7 +282,7 @@ export default function CreateGroupScreen() {
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#007AFF" />
-            <Text className="mt-4 text-gray-600">Loading contacts...</Text>
+            <Text className="mt-4 text-gray-600 dark:text-gray-300">Loading contacts...</Text>
           </View>
         ) : (
           <FlatList
@@ -317,7 +314,7 @@ export default function CreateGroupScreen() {
             ListEmptyComponent={
               <View className="items-center justify-center py-12 px-4">
                 <Ionicons name="people-outline" size={64} color="#D1D5DB" />
-                <Text className="mt-4 text-lg font-semibold text-gray-900">No members found</Text>
+                <Text className="mt-4 text-lg font-semibold text-gray-900 dark:text-gray-100">No members found</Text>
               </View>
             }
           />
@@ -328,19 +325,19 @@ export default function CreateGroupScreen() {
   }
 
   return (
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 px-4 bg-white">
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 px-4 bg-white dark:bg-black">
         {renderProgressIndicator()}
         {currentStep === 1 ? renderStep1() : renderStep2()}
 
-        <View className="px-4 py-4 bg-white border-t border-gray-200">
+        <View className="px-4 py-4 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-700">
           <View className="flex-row gap-3">
             {currentStep === 2 && <Button
               variant="outline"
-              className="flex-1 py-3 rounded-lg border-gray-300"
+              className="flex-1 py-3 rounded-lg border-gray-300 dark:border-gray-600"
               onPress={handleBackStep}
               disabled={isCreatingGroup}
             >
-              <Text className="text-center text-gray-700 font-semibold">Back</Text>
+              <Text className="text-center text-gray-700 dark:text-gray-200 font-semibold">Back</Text>
             </Button>}
 
               {currentStep === 1 ? (<Button

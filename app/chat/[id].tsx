@@ -157,11 +157,11 @@ export default function ChatScreen() {
 
 
   return (
-    <SafeAreaView className='flex-1 bg-blue-400' edges={['top', 'left', 'right']}>
+    <SafeAreaView className='flex-1' edges={['top', 'left', 'right']}>
       <AuthGuard>
-        <View className="flex-1 bg-white">
+        <View className="flex-1 bg-white dark:bg-[#181818]">
           {/* Header */}
-          <View className="p-4 border-b border-gray-200 bg-white flex flex-row">
+          <View className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#181818] flex flex-row">
             <View className="flex-1 flex-row items-center">
               <TouchableOpacity
                 className="mr-3"
@@ -181,10 +181,10 @@ export default function ChatScreen() {
                 )}
               </View>
               <View className="flex-1">
-                <Text className="font-semibold text-lg text-gray-900">
+                <Text className="font-semibold text-lg text-gray-900 dark:text-gray-100">
                   {receiver?.receiver?.name || 'Unknown User'}
                 </Text>
-                <Text className="text-sm text-green-500">Online</Text>
+                {/* <Text className="text-sm text-green-500">Online</Text> */}
               </View>
             </View>
             {selectionType === 'group' && <DropdownMenu>
@@ -196,22 +196,22 @@ export default function ChatScreen() {
                   <Ionicons name="ellipsis-vertical" size={24} color="#007AFF" className="mr-2" />
                 </TouchableOpacity>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="mr-2 bg-white rounded-lg shadow-lg border border-gray-200">
+              <DropdownMenuContent className="mr-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
                 {(isAdmin || isOwner || (receiver?.receiver as Group).settings?.allowMemberInvite) && <DropdownMenuItem>
                   <Ionicons name='person-add' size={24} color="#007AFF" className='mr-2' />
-                  <Text>Add Member</Text>
+                  <Text className="dark:text-gray-100">Add Member</Text>
                 </DropdownMenuItem>}
                 <DropdownMenuItem onPress={() => { requestAnimationFrame(() => bottomSheetRef.current?.present()); }}>
                   <Ionicons name="information-circle-outline" size={24} color="#007AFF" className="mr-2" />
-                  <Text>Group Info</Text>
+                  <Text className="dark:text-gray-100">Group Info</Text>
                 </DropdownMenuItem>
                 {(isAdmin || isOwner) && <DropdownMenuItem>
                   <Ionicons name='person-remove' size={24} color="#007AFF" className='mr-2' />
-                  <Text>Remove Member</Text>
+                  <Text className="dark:text-gray-100">Remove Member</Text>
                 </DropdownMenuItem>}
                 {(isAdmin || isOwner || !(receiver?.receiver as Group).settings?.isPrivate) && <DropdownMenuItem onPress={() => router.push(`/group/${receiver?.receiver?._id}`)}>
                   <Ionicons name="pencil-outline" size={24} color="#007AFF" className="mr-2" />
-                  <Text>Edit Group</Text>
+                  <Text className="dark:text-gray-100">Edit Group</Text>
                 </DropdownMenuItem>}
                 {!isOwner ? (
                   <>
@@ -224,7 +224,7 @@ export default function ChatScreen() {
                       disabled={isLeavingGroup}
                     >
                       <Ionicons name="exit-outline" size={24} color="#007AFF" className="mr-2" />
-                      <Text>Leave Group</Text>
+                      <Text className="dark:text-gray-100">Leave Group</Text>
                       {isLeavingGroup && (
                         <View className="ml-2">
                           <ActivityIndicator size="small" color="#007AFF" />
@@ -243,7 +243,7 @@ export default function ChatScreen() {
                       disabled={isDeletingGroup}
                     >
                       <Ionicons name="trash-outline" size={24} color="#007AFF" className="mr-2" />
-                      <Text>Delete Group</Text>
+                      <Text className="dark:text-gray-100">Delete Group</Text>
                       {isDeletingGroup && (
                         <View className="ml-2">
                           <ActivityIndicator size="small" color="#007AFF" />
@@ -331,12 +331,12 @@ export default function ChatScreen() {
               (selectionType === 'private') ? (
               <>
                 {/* Message Input Bar */}
-                <View className="border-t border-gray-200 bg-white z-1" style={{ paddingBottom: insets.bottom + 30 }}>
+                <View className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#181818] z-1" style={{ paddingBottom: insets.bottom + 30 }}>
                   {/* --- Reply Preview (if any) --- */}
                   {selectedMessage && isReplyTo && (
-                    <View className="flex-row items-start px-4 py-2 bg-gray-100 border-l-4 border-blue-500">
+                    <View className="flex-row items-start px-4 py-2 bg-gray-100 dark:bg-gray-800 border-l-4 border-blue-500">
                       <View className="flex-1">
-                        <Text className="text-xs text-gray-600 font-medium">
+                        <Text className="text-xs text-gray-600 dark:text-gray-300 font-medium">
                           Replying to {selectedMessage.sender.name}
                         </Text>
 
@@ -351,13 +351,13 @@ export default function ChatScreen() {
                             )}
                             <Text
                               numberOfLines={2}
-                              className="text-sm text-gray-700 flex-shrink"
+                              className="text-sm text-gray-700 dark:text-gray-200 flex-shrink"
                             >
                               {selectedMessage.content || "File message"}
                             </Text>
                           </View>
                         ) : (
-                          <Text numberOfLines={2} className="text-sm text-gray-700 mt-1">
+                          <Text numberOfLines={2} className="text-sm text-gray-700 dark:text-gray-200 mt-1">
                             {selectedMessage.content}
                           </Text>
                         )}
@@ -377,7 +377,7 @@ export default function ChatScreen() {
                   )}
 
                   {/* --- Message Input Bar --- */}
-                  <View className="flex-row items-center p-4 bg-white">
+                  <View className="flex-row items-center p-4 bg-white dark:bg-[#181818]">
                     <TouchableOpacity className="mr-3">
                       <Ionicons name="add" size={24} color="#007AFF" />
                     </TouchableOpacity>
@@ -386,7 +386,7 @@ export default function ChatScreen() {
                       value={message}
                       onChangeText={setMessage}
                       placeholder="Type a message..."
-                      className="flex-1 border border-gray-300 rounded-full px-4 py-3 mr-3"
+                      className="flex-1 border border-gray-300 dark:border-gray-600 rounded-full px-4 py-3 mr-3 dark:text-gray-100"
                       multiline
                     />
 
@@ -400,8 +400,8 @@ export default function ChatScreen() {
                 </View>
               </>
             ) : (
-              <View className="border-t py-4 px-2 items-center justify-center border-gray-200 bg-gray-100 rounded-lg absolute bottom-2 left-0 right-0">
-                <Text className="text-center font-medium text-gray-500 underline">You are not allowed to send message to this group</Text>
+              <View className="border-t py-4 px-2 items-center justify-center border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-lg absolute bottom-2 left-0 right-0">
+                <Text className="text-center font-medium text-gray-500 dark:text-gray-400 underline">You are not allowed to send message to this group</Text>
               </View>
             ))}
           </KeyboardAvoidingView>
@@ -414,9 +414,9 @@ export default function ChatScreen() {
               animationType="fade"
             >
               <View className="flex-1 bg-black/50 items-center justify-center">
-                <View className="bg-white rounded-lg p-6 items-center min-w-[200px]">
+                <View className="bg-white dark:bg-gray-900 rounded-lg p-6 items-center min-w-[200px]">
                   <ActivityIndicator size="large" color="#007AFF" />
-                  <Text className="mt-4 text-gray-900 font-medium text-base">
+                  <Text className="mt-4 text-gray-900 dark:text-gray-100 font-medium text-base">
                     {isLeavingGroup ? 'Leaving group...' : 'Deleting group...'}
                   </Text>
                 </View>

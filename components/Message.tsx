@@ -226,7 +226,7 @@ export default function Message({ item, setIsReplyTo, selectedMessage, setSelect
 
                             {/* Timestamp */}
                             <Text className="text-xs text-gray-500 mt-1">
-                                {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </Text>
                         </Pressable>
                     </View>

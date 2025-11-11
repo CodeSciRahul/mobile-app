@@ -28,11 +28,11 @@ export default function GroupInfo({ group }: GroupInfoProps) {
 
   return (
     <ScrollView 
-      className="flex-1 bg-white"
+      className="flex-1"
       showsVerticalScrollIndicator={false}
     >
       {/* Header Section */}
-      <View className="items-center px-6 pt-4 pb-6 border-b border-gray-100">
+      <View className="items-center px-6 pt-4 pb-6 border-b border-gray-100 dark:border-gray-800">
         {/* Profile Picture */}
         <View className="mb-4">
           {group.profilePicture ? (
@@ -50,13 +50,13 @@ export default function GroupInfo({ group }: GroupInfoProps) {
         </View>
 
         {/* Group Name */}
-        <Text className="text-2xl font-bold text-gray-900 mb-2 text-center">
+        <Text className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2 text-center">
           {group.name}
         </Text>
 
         {/* Description */}
         {group.description && (
-          <Text className="text-sm text-gray-600 text-center px-4">
+          <Text className="text-sm text-gray-600 dark:text-gray-300 text-center px-4">
             {group.description}
           </Text>
         )}
@@ -71,8 +71,8 @@ export default function GroupInfo({ group }: GroupInfoProps) {
       </View>
 
       {/* Settings Section */}
-      <View className="px-6 py-5 border-b border-gray-100">
-        <Text className="text-lg font-bold text-gray-900 mb-4">Group Settings</Text>
+      <View className="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+        <Text className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Group Settings</Text>
         
         <View>
           {/* Privacy Setting */}
@@ -86,8 +86,8 @@ export default function GroupInfo({ group }: GroupInfoProps) {
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-base font-semibold text-gray-900">Privacy</Text>
-                <Text className="text-sm text-gray-500">
+                <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">Privacy</Text>
+                <Text className="text-sm text-gray-500 dark:text-gray-400">
                   {group.settings?.isPrivate ? 'Only admin can edit group details' : 'Member can edit group details'}
                 </Text>
               </View>
@@ -105,8 +105,8 @@ export default function GroupInfo({ group }: GroupInfoProps) {
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-base font-semibold text-gray-900">Member Invites</Text>
-                <Text className="text-sm text-gray-500">
+                <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">Member Invites</Text>
+                <Text className="text-sm text-gray-500 dark:text-gray-400">
                   {group.settings?.allowMemberInvite ? 'Members can invite' : 'Only admins can invite'}
                 </Text>
               </View>
@@ -124,8 +124,8 @@ export default function GroupInfo({ group }: GroupInfoProps) {
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-base font-semibold text-gray-900">Messages</Text>
-                <Text className="text-sm text-gray-500">
+                <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">Messages</Text>
+                <Text className="text-sm text-gray-500 dark:text-gray-400">
                   {group.settings?.adminOnlyMessages ? 'Only admins can send' : 'All members can send'}
                 </Text>
               </View>
@@ -135,12 +135,12 @@ export default function GroupInfo({ group }: GroupInfoProps) {
           {/* Created Date */}
           {group.createdAt && (
             <View className="flex-row items-center py-2">
-              <View className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center mr-3">
+              <View className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 items-center justify-center mr-3">
                 <Ionicons name="calendar" size={20} color="#6B7280" />
               </View>
               <View className="flex-1">
-                <Text className="text-base font-semibold text-gray-900">Created</Text>
-                <Text className="text-sm text-gray-500">{formatDate(group.createdAt)}</Text>
+                <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">Created</Text>
+                <Text className="text-sm text-gray-500 dark:text-gray-400">{formatDate(group.createdAt)}</Text>
               </View>
             </View>
           )}
@@ -150,14 +150,14 @@ export default function GroupInfo({ group }: GroupInfoProps) {
       {/* Members Section */}
       <View className="px-6 py-5">
         <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-lg font-bold text-gray-900">Members</Text>
-          <Text className="text-sm text-gray-500">{members.length} total</Text>
+          <Text className="text-lg font-bold text-gray-900 dark:text-gray-100">Members</Text>
+          <Text className="text-sm text-gray-500 dark:text-gray-400">{members.length} total</Text>
         </View>
 
         {/* Admins */}
         {admins.length > 0 && (
           <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-3">
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
               Administrators ({admins.length})
             </Text>
             {admins.map((member) => (
@@ -174,7 +174,7 @@ export default function GroupInfo({ group }: GroupInfoProps) {
         {/* Participants */}
         {participants.length > 0 && (
           <View>
-            <Text className="text-sm font-semibold text-gray-700 mb-3">
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
               Participants ({participants.length})
             </Text>
             {participants.map((member) => (
@@ -199,7 +199,7 @@ interface MemberItemProps {
 
 function MemberItem({ member, isCurrentUser, isOwner }: MemberItemProps) {
   return (
-    <View className="flex-row items-center py-3 border-b border-gray-50">
+    <View className="flex-row items-center py-3 border-b border-gray-50 dark:border-gray-800">
       {/* Avatar */}
       <View className="w-12 h-12 rounded-full bg-blue-500 items-center justify-center mr-3 overflow-hidden">
         {member.user?.profilePicture ? (
@@ -217,7 +217,7 @@ function MemberItem({ member, isCurrentUser, isOwner }: MemberItemProps) {
       {/* Name and Info */}
       <View className="flex-1">
         <View className="flex-row items-center">
-          <Text className="text-base font-semibold text-gray-900">
+          <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">
             {member.user.name || 'Unknown User'}
           </Text>
           {isCurrentUser && (
@@ -226,7 +226,7 @@ function MemberItem({ member, isCurrentUser, isOwner }: MemberItemProps) {
             </View>
           )}
         </View>
-        <Text className="text-sm text-gray-500">{member.user.email}</Text>
+        <Text className="text-sm text-gray-500 dark:text-gray-400">{member.user.email}</Text>
       </View>
 
       {/* Role Badge */}

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { View, BackHandler } from 'react-native';
+import { BackHandler, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export interface BottomSheetProps {
@@ -80,6 +80,8 @@ export const BottomSheetComponent = forwardRef<BottomSheetRef, BottomSheetProps>
 
   const [isOpen, setIsOpen] = useState(false);
   const memoizedSnapPoints = useMemo(() => snapPoints, [snapPoints]);
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   useImperativeHandle(ref, () => ({
     present: () => {
@@ -120,7 +122,7 @@ export const BottomSheetComponent = forwardRef<BottomSheetRef, BottomSheetProps>
 
     return (
       <View className={cn('items-center py-3', handleClassName)}>
-        <View className="w-12 h-1.5 bg-gray-300 rounded-full" />
+        <View className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full" />
       </View>
     );
   }, [showHandle, handleClassName]);
@@ -150,7 +152,7 @@ export const BottomSheetComponent = forwardRef<BottomSheetRef, BottomSheetProps>
           display: 'none',
         }}
         backgroundStyle={{
-          backgroundColor: 'white',
+          backgroundColor: isDark ? '#111827' : 'white',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
         }}
@@ -174,7 +176,7 @@ export const BottomSheetComponent = forwardRef<BottomSheetRef, BottomSheetProps>
           }}
         >
           <HandleIndicator />
-          <View className={cn('flex-1', className)}>
+          <View className={cn('flex-1 bg-white dark:bg-gray-900', className)}>
             {children}
           </View>
         </BottomSheetScrollView>
