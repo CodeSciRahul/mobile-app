@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/input";
@@ -12,6 +12,8 @@ export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === 'dark';
 
 
     const {mutate: signinMutation, isPending: isLoading} = useMutation({
@@ -48,7 +50,7 @@ export default function LoginScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView className="flex-1 bg-white dark:bg-[#181818]">
             <KeyboardAvoidingView 
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="flex-1"
@@ -57,6 +59,7 @@ export default function LoginScreen() {
                     contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
+                    className="dark:bg-[#181818] bg-white"
                 >
                     <View className="flex-1 px-6 pt-8">
                         {/* Header */}
@@ -64,8 +67,8 @@ export default function LoginScreen() {
                             <View className="w-20 h-20 bg-blue-600 rounded-full items-center justify-center mb-4">
                                 <Ionicons name="chatbubbles" size={40} color="white" />
                             </View>
-                            <Text className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</Text>
-                            <Text className="text-gray-600 text-center">
+                            <Text className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Welcome Back</Text>
+                            <Text className="text-gray-600 dark:text-gray-400 text-center">
                                 Sign in to your account to continue
                             </Text>
                         </View>
@@ -80,7 +83,8 @@ export default function LoginScreen() {
                                     keyboardType="email-address"
                                     autoCapitalize="none"
                                     autoCorrect={false}
-                                    className="mb-4 py-2"
+                                    placeholderTextColor={isDark ? '#9CA3AF' : '#6B7280'}
+                                    className="mb-4 py-2 text-gray-900 dark:text-gray-100"
                                 />
 
                                 <View>
@@ -89,7 +93,8 @@ export default function LoginScreen() {
                                         value={password}
                                         onChangeText={setPassword}
                                         secureTextEntry={!showPassword}
-                                        className="mb-4"
+                                        placeholderTextColor={isDark ? '#9CA3AF' : '#6B7280'}
+                                        className="mb-4 text-gray-900 dark:text-gray-100"
                                     />
                                     <TouchableOpacity
                                         onPress={() => setShowPassword(!showPassword)}
@@ -98,13 +103,13 @@ export default function LoginScreen() {
                                         <Ionicons 
                                             name={showPassword ? "eye-off" : "eye"} 
                                             size={20} 
-                                            color="#6B7280" 
+                                            color={isDark ? '#9CA3AF' : '#6B7280'} 
                                         />
                                     </TouchableOpacity>
                                 </View>
 
                                 <TouchableOpacity className="self-end mb-6">
-                                    <Text className="text-blue-600 font-medium">
+                                    <Text className="text-blue-600 dark:text-blue-400 font-medium">
                                         Forgot Password?
                                     </Text>
                                 </TouchableOpacity>
@@ -122,9 +127,9 @@ export default function LoginScreen() {
                         {/* Footer */}
                         <View className="pb-8">
                             <View className="flex-row items-center justify-center space-x-2">
-                                <Text className="text-gray-600">Don't have an account?</Text>
+                                <Text className="text-gray-600 dark:text-gray-400">Don't have an account?</Text>
                                 <TouchableOpacity onPress={handleSignUp}>
-                                    <Text className="text-blue-600 font-semibold">
+                                    <Text className="text-blue-600 dark:text-blue-400 font-semibold">
                                         Sign Up
                                     </Text>
                                 </TouchableOpacity>

@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/input";
@@ -15,6 +15,8 @@ export default function SignUpScreen() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === 'dark';
 
     const {mutate: signupMutation, isPending: isLoading} = useMutation({
         mutationFn: async ({ name, email, password }: { name: string; email: string; password: string }) => 
@@ -67,7 +69,7 @@ export default function SignUpScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView className="flex-1 bg-white dark:bg-[#181818]">
             <KeyboardAvoidingView 
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="flex-1"
@@ -76,6 +78,7 @@ export default function SignUpScreen() {
                     contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
+                    className="dark:bg-[#181818] bg-white"
                 >
                     <View className="flex-1 px-6 pt-8">
                         {/* Header */}
@@ -83,8 +86,8 @@ export default function SignUpScreen() {
                             <View className="w-20 h-20 bg-blue-600 rounded-full items-center justify-center mb-4">
                                 <Ionicons name="person-add" size={40} color="white" />
                             </View>
-                            <Text className="text-3xl font-bold text-gray-900 mb-2">Create Account</Text>
-                            <Text className="text-gray-600 text-center">
+                            <Text className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Create Account</Text>
+                            <Text className="text-gray-600 dark:text-gray-400 text-center">
                                 Join us and start chatting with friends
                             </Text>
                         </View>
@@ -98,7 +101,8 @@ export default function SignUpScreen() {
                                     onChangeText={setName}
                                     autoCapitalize="words"
                                     autoCorrect={false}
-                                    className="mb-4"
+                                    placeholderTextColor={isDark ? '#9CA3AF' : '#6B7280'}
+                                    className="mb-4 text-gray-900 dark:text-gray-100"
                                 />
 
                                 <Input
@@ -108,7 +112,8 @@ export default function SignUpScreen() {
                                     keyboardType="email-address"
                                     autoCapitalize="none"
                                     autoCorrect={false}
-                                    className="mb-4"
+                                    placeholderTextColor={isDark ? '#9CA3AF' : '#6B7280'}
+                                    className="mb-4 text-gray-900 dark:text-gray-100"
                                 />
 
                                 <View>
@@ -117,7 +122,8 @@ export default function SignUpScreen() {
                                         value={password}
                                         onChangeText={setPassword}
                                         secureTextEntry={!showPassword}
-                                        className="mb-4"
+                                        placeholderTextColor={isDark ? '#9CA3AF' : '#6B7280'}
+                                        className="mb-4 text-gray-900 dark:text-gray-100"
                                     />
                                     <TouchableOpacity
                                         onPress={() => setShowPassword(!showPassword)}
@@ -126,7 +132,7 @@ export default function SignUpScreen() {
                                         <Ionicons 
                                             name={showPassword ? "eye-off" : "eye"} 
                                             size={20} 
-                                            color="#6B7280" 
+                                            color={isDark ? '#9CA3AF' : '#6B7280'} 
                                         />
                                     </TouchableOpacity>
                                 </View>
@@ -137,7 +143,8 @@ export default function SignUpScreen() {
                                         value={confirmPassword}
                                         onChangeText={setConfirmPassword}
                                         secureTextEntry={!showConfirmPassword}
-                                        className="mb-4"
+                                        placeholderTextColor={isDark ? '#9CA3AF' : '#6B7280'}
+                                        className="mb-4 text-gray-900 dark:text-gray-100"
                                     />
                                     <TouchableOpacity
                                         onPress={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -146,13 +153,13 @@ export default function SignUpScreen() {
                                         <Ionicons 
                                             name={showConfirmPassword ? "eye-off" : "eye"} 
                                             size={20} 
-                                            color="#6B7280" 
+                                            color={isDark ? '#9CA3AF' : '#6B7280'} 
                                         />
                                     </TouchableOpacity>
                                 </View>
 
                                 <View className="mb-6">
-                                    <Text className="text-xs text-gray-500 leading-4">
+                                    <Text className="text-xs text-gray-500 dark:text-gray-400 leading-4">
                                         By creating an account, you agree to our Terms of Service and Privacy Policy.
                                     </Text>
                                 </View>
@@ -170,9 +177,9 @@ export default function SignUpScreen() {
                         {/* Footer */}
                         <View className="pb-8">
                             <View className="flex-row items-center justify-center space-x-2">
-                                <Text className="text-gray-600">Already have an account?</Text>
+                                <Text className="text-gray-600 dark:text-gray-400">Already have an account?</Text>
                                 <TouchableOpacity onPress={handleLogin}>
-                                    <Text className="text-blue-600 font-semibold">
+                                    <Text className="text-blue-600 dark:text-blue-400 font-semibold">
                                         Sign In
                                     </Text>
                                 </TouchableOpacity>

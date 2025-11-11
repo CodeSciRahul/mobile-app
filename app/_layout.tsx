@@ -9,10 +9,12 @@ import "../global.css";
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useColorScheme } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient());
   const colorschema = useColorScheme()
+  const safeAreaInset = useSafeAreaInsets()
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -69,7 +71,12 @@ export default function RootLayout() {
             </Stack>
           </BottomSheetModalProvider>
           <PortalHost />
-          <Toast />
+          <Toast 
+          position='top'
+          topOffset={
+            safeAreaInset.top + 10
+          }
+          />
         </SafeAreaProvider>
 
       </GestureHandlerRootView>

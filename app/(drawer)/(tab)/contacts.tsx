@@ -119,7 +119,10 @@ export default function ChatsScreen() {
           renderItem={renderChatItem}
           showsVerticalScrollIndicator={false}
         />
-        <TouchableOpacity onPress={() => { setBottomSheetOpen(true); requestAnimationFrame(() => bottomSheetRef.current?.present()); }} className={`${isDark ? 'bg-gray-800' : 'bg-gray-200'} absolute bottom-10 right-10 p-4 rounded-xl`}>
+        <TouchableOpacity onPress={() => { 
+          setBottomSheetOpen(true); 
+          requestAnimationFrame(() => bottomSheetRef.current?.present()); 
+          }} className={`${isDark ? 'bg-gray-800' : 'bg-gray-200'} absolute bottom-10 right-10 p-4 rounded-xl`}>
           <Ionicons name="add" size={24} color="#007AFF" />
         </TouchableOpacity>
       </View>
