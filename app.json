@@ -11,7 +11,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.convoo.app",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.convoo.app",
@@ -95,6 +98,12 @@
       "eas": {
         "projectId": "b01ccf78-9036-45cb-9fa6-7147e49aacfc"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/b01ccf78-9036-45cb-9fa6-7147e49aacfc"
     }
   }
 }
